@@ -1,0 +1,24 @@
+{
+  "name": "demo_typescript",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/mkdirp": "^1.0.2",
+    "@types/rimraf": "^3.0.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@balancy/core": "^1.0.0-rc.29",
+    "@balancy/wasm": "^1.0.0-rc.29",
+    "mkdirp": "^3.0.1",
+    "rimraf": "^6.0.1"
+  }
+}
