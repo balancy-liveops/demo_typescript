@@ -91,11 +91,11 @@ export class FileHelperClass {
     }
   }
 
-  // public getFilesInFolderCallback(folder: string): string[] {
-  public getFilesInFolderCallback(folder: string): CoreVector<string> {
+  public getFilesInFolderCallback(folder: string): string[] {
+  // public getFilesInFolderCallback(folder: string): CoreVector<string> {
     const files = readdirSync(resolve(this.root, folder));
-    // return files;
-    return new Vector(files);
+    return files;
+    // return new Vector(files);
   }
   public createSubDirectoryInCacheCallback(fileName: string): void {
     mkdirpSync(resolve(this.cacheDir, fileName)); // todo check logic
@@ -133,14 +133,14 @@ export class FileHelperClass {
   public deleteCachedFileCallback(path: string): void {
     unlinkSync(resolve(this.cacheDir, path));
   }
-  public getFilesInCachedFolderCallback(path: string): CoreVector<string> {
-    let fullPath = resolve(this.cacheDir, path);
-    return new Vector(readdirSync(fullPath));
-  }
-  // public getFilesInCachedFolderCallback(path: string): string[] {
+  // public getFilesInCachedFolderCallback(path: string): CoreVector<string> {
   //   let fullPath = resolve(this.cacheDir, path);
-  //   return readdirSync(fullPath);
+  //   return new Vector(readdirSync(fullPath));
   // }
+  public getFilesInCachedFolderCallback(path: string): string[] {
+    let fullPath = resolve(this.cacheDir, path);
+    return readdirSync(fullPath);
+  }
   public applyTempFolderCallback(tempFolder: string): void {
     const tempPath = resolve(this.cacheDir, tempFolder);
 

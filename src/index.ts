@@ -9,6 +9,14 @@ function subscribeToCallbacks() {
             const systemProfile = Balancy.Profiles.system;
 
             if (systemProfile) {
+                const generalInfo = systemProfile.generalInfo;
+                console.log("*** general Info *** ");
+                console.log("ProfileId: ", generalInfo.profileId);
+                console.log("Country: ", generalInfo.country);
+                console.log("First Login: ", generalInfo.firstLoginTime);
+                console.log("Session: ", generalInfo.session);
+                console.log("PlayTime: ", generalInfo.playTime);
+
                 const activeEvents = systemProfile.smartInfo.gameEvents;
                 console.log("*** Active Events: ", activeEvents.count);
                 for (let i = 0;i<activeEvents.count;i++) {
@@ -35,7 +43,7 @@ function subscribeToCallbacks() {
 }
 
 (async () => {
-    // await Balancy.Main.initializeFileHelper(new FileHelperClass("balancy-test-root"));
+    await Balancy.Main.initializeFileHelper(new FileHelperClass("balancy-test-root"));
 
     //TODO add your game id and public key
     const config = AppConfig.create({
@@ -49,7 +57,6 @@ function subscribeToCallbacks() {
     config.customId = "Custom456";
     config.appVersion = "1.0.0";
     config.engineVersion = "TypeScript_1.0";
-    config.launchType = LaunchType.Local;
 
     Balancy.Callbacks.initExamplesWithLogs();
 
