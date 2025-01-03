@@ -7,6 +7,8 @@ import { initializeBalancy } from './balancyLoader';
 import GeneralInfoPage from "./pages/GeneralInfoPage";
 import ABTestsPage from "./pages/ABTestsPage";
 import SegmentationPage from "./pages/SegmentationPage";
+import AdsPage from "./pages/AdsPage";
+import GameEventsPage from "./pages/GameEventsPage";
 
 const App: React.FC = () => {
     const [loading, setLoading] = useState(true);
@@ -42,6 +44,8 @@ const App: React.FC = () => {
                     <Link to="/info" style={styles.tab}>Info</Link>
                     <Link to="/ab-tests" style={styles.tab}>AB Tests</Link>
                     <Link to="/segmentation" style={styles.tab}>Segmentation</Link>
+                    <Link to="/ads" style={styles.tab}>Ads</Link>
+                    <Link to="/game-events" style={styles.tab}>Game Events</Link>
                     <Link to="/about" style={styles.tab}>About</Link>
                     <Link to="/contact" style={styles.tab}>Contact</Link>
                 </nav>
@@ -52,6 +56,8 @@ const App: React.FC = () => {
                         <Route path="/info" element={<GeneralInfoPage />} />
                         <Route path="/ab-tests" element={<ABTestsPage />} />
                         <Route path="/segmentation" element={<SegmentationPage />} />
+                        <Route path="/ads" element={<AdsPage />} />
+                        <Route path="/game-events" element={<GameEventsPage />} />
                         <Route path="/about" element={<AboutPage />} />
                         <Route path="/contact" element={<ContactPage />} />
                     </Routes>
