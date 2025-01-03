@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx", // Enables JSX syntax for React 17+
+    "target": "ES6",    // Adjust as necessary
+    "module": "ESNext", // Adjust as necessary
+    "strict": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}

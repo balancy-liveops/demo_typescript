@@ -1,0 +1,34 @@
+{
+  "name": "balancy-demo",
+  "version": "1.0.0",
+  "main": "index.tsx",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build"
+  },
+  "dependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^7.1.1"
+  },
+  "proxy": "http://localhost:3000",
+  "devDependencies": {
+    "@balancy/core": "file:../../plugin_cpp_typescript/packages/core",
+    "@balancy/wasm": "file:../../plugin_cpp_typescript/packages/wasm",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "typescript": "^4.9.5"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
