@@ -9,6 +9,7 @@ import ABTestsPage from "./pages/ABTestsPage";
 import SegmentationPage from "./pages/SegmentationPage";
 import AdsPage from "./pages/AdsPage";
 import GameEventsPage from "./pages/GameEventsPage";
+import InventoryPage from "./pages/InventoryPage";
 
 const App: React.FC = () => {
     const [loading, setLoading] = useState(true);
@@ -46,6 +47,7 @@ const App: React.FC = () => {
                     <Link to="/segmentation" style={styles.tab}>Segmentation</Link>
                     <Link to="/ads" style={styles.tab}>Ads</Link>
                     <Link to="/game-events" style={styles.tab}>Game Events</Link>
+                    <Link to="/inventory" style={styles.tab}>Inventory</Link>
                     <Link to="/about" style={styles.tab}>About</Link>
                     <Link to="/contact" style={styles.tab}>Contact</Link>
                 </nav>
@@ -58,6 +60,7 @@ const App: React.FC = () => {
                         <Route path="/segmentation" element={<SegmentationPage />} />
                         <Route path="/ads" element={<AdsPage />} />
                         <Route path="/game-events" element={<GameEventsPage />} />
+                        <Route path="/inventory" element={<InventoryPage />} />
                         <Route path="/about" element={<AboutPage />} />
                         <Route path="/contact" element={<ContactPage />} />
                     </Routes>
