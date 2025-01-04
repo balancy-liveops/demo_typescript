@@ -16,7 +16,8 @@ const StoreItemView: React.FC<StoreItemViewProps> = ({ storeItem, canBuy, onBuy 
 
     let priceStr = "N/A";
     if (storeItem?.price?.product)
-        priceStr = `$ ${storeItem?.price?.product?.price.toFixed(2)}`
+        priceStr = `$ ${storeItem?.price?.product?.price.toFixed(2)}`;
+
     return (
         <div
             style={{
