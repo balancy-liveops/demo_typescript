@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import HomePage from './pages/HomePage';
-import AboutPage from './pages/AboutPage';
-import ContactPage from './pages/ContactPage';
 import { initializeBalancy } from './balancyLoader';
 import GeneralInfoPage from "./pages/GeneralInfoPage";
 import ABTestsPage from "./pages/ABTestsPage";
@@ -12,22 +10,27 @@ import GameEventsPage from "./pages/GameEventsPage";
 import InventoryPage from "./pages/InventoryPage";
 import GameOffersPage from "./pages/GameOffersPage";
 import { Balancy} from '@balancy/core';
+import ShopPage from "./pages/ShopPage";
 
 const App: React.FC = () => {
     const [loading, setLoading] = useState(true);
+    const initializedRef = React.useRef(false);
 
     useEffect(() => {
-        const loadBalancy = async () => {
-            try {
-                await initializeBalancy();
-                setLoading(false);
-            } catch (error) {
-                console.error('Error initializing Balancy:', error);
-            }
-        };
-
+        if (!initializedRef.current) {
+            initializedRef.current = true;
+            const loadBalancy = async () => {
+                try {
+                    await initializeBalancy();
+                    setLoading(false);
+                } catch (error) {
+                    console.error('Error initializing Balancy:', error);
+                }
+            };
+            loadBalancy();
+        }
         addKeyframes();
-        loadBalancy();
+
     }, []);
 
     const handleReset = () => {
@@ -57,9 +60,8 @@ const App: React.FC = () => {
                         <Link to="/ads" style={styles.tab}>Ads</Link>
                         <Link to="/game-events" style={styles.tab}>Game Events</Link>
                         <Link to="/offers" style={styles.tab}>Offers</Link>
+                        <Link to="/shop" style={styles.tab}>Shop</Link>
                         <Link to="/inventory" style={styles.tab}>Inventory</Link>
-                        <Link to="/about" style={styles.tab}>About</Link>
-                        <Link to="/contact" style={styles.tab}>Contact</Link>
                     </div>
                     <button style={styles.resetButton} onClick={handleReset}>Reset</button>
                 </nav>
@@ -73,9 +75,8 @@ const App: React.FC = () => {
                         <Route path="/ads" element={<AdsPage />} />
                         <Route path="/game-events" element={<GameEventsPage />} />
                         <Route path="/offers" element={<GameOffersPage />} />
+                        <Route path="/shop" element={<ShopPage />} />
                         <Route path="/inventory" element={<InventoryPage />} />
-                        <Route path="/about" element={<AboutPage />} />
-                        <Route path="/contact" element={<ContactPage />} />
                     </Routes>
                 </div>
             </div>

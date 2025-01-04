@@ -14,6 +14,9 @@ const StoreItemView: React.FC<StoreItemViewProps> = ({ storeItem, canBuy, onBuy 
         }
     };
 
+    let priceStr = "N/A";
+    if (storeItem?.price?.product)
+        priceStr = `$ ${storeItem?.price?.product?.price.toFixed(2)}`
     return (
         <div
             style={{
@@ -33,6 +36,8 @@ const StoreItemView: React.FC<StoreItemViewProps> = ({ storeItem, canBuy, onBuy 
                 src={storeItem?.sprite?.getFullUrl() || ""}
                 alt="Sprite"
                 style={{
+                    minWidth: "80px",
+                    minHeight: "80px",
                     width: "80px",
                     height: "80px",
                     objectFit: "contain",
@@ -52,7 +57,7 @@ const StoreItemView: React.FC<StoreItemViewProps> = ({ storeItem, canBuy, onBuy 
                     cursor: canBuy ? "pointer" : "not-allowed",
                 }}
             >
-                {"$ " + storeItem?.price?.product?.price}
+                {priceStr}
             </button>
         </div>
     );
