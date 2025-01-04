@@ -33,9 +33,6 @@ const OfferView: React.FC<OfferViewProps> = ({ offerInfo }) => {
     }, [offerInfo]);
 
     const refreshCallback = () => {
-        // Re-fetch or refresh the offer group data if needed.
-        console.log("refreshCallback");
-        //setCurrentOfferGroup(currentOfferGroup); // Triggers a re-render
         setRefreshKey((prev) => prev + 1);
     };
 

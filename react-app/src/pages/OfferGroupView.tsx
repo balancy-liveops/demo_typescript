@@ -34,9 +34,6 @@ const OfferGroupView: React.FC<OfferGroupViewProps> = ({ offerGroupInfo }) => {
     }, [currentOfferGroup]);
 
     const refreshCallback = () => {
-        // Re-fetch or refresh the offer group data if needed.
-        console.log("refreshCallback");
-        //setCurrentOfferGroup(currentOfferGroup); // Triggers a re-render
         setRefreshKey((prev) => prev + 1);
     };
 
@@ -76,7 +73,6 @@ const OfferGroupView: React.FC<OfferGroupViewProps> = ({ offerGroupInfo }) => {
         }
     };
 
-    console.log("REFRESH GROUP OFFER: " + offerGroupInfo.instanceId + " > " + offerGroupInfo.getRawPointer());
     return (
         <div key={refreshKey} style={{ border: "1px solid #ccc", borderRadius: "5px", marginBottom: "10px", padding: "10px", maxWidth: "600px" }}>
             {/* First Row */}
@@ -98,7 +94,6 @@ const OfferGroupView: React.FC<OfferGroupViewProps> = ({ offerGroupInfo }) => {
             <div style={{ display: "flex", overflowX: "auto", marginTop: "10px", gap: "10px" }}>
                 {currentOfferGroup.gameOfferGroup?.storeItems.map((storeItem) => {
                     const canBuy = currentOfferGroup.canPurchase(storeItem); // Dynamically calculate
-                    console.log("StoreItem = " + storeItem?.unnyId + " canBuy = " + canBuy);
                     return (
                         <StoreItemView
                             key={storeItem?.unnyId}

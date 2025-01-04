@@ -13,7 +13,6 @@ const GameOffersPage: React.FC = () => {
     const [refreshKey, setRefreshKey] = useState(0);
 
     const refreshOffers = () => {
-        console.log("**** refreshOffers");
         if (!Balancy.Main.isReadyToUse) {
             console.warn("Balancy is not ready to use.");
             return;
@@ -27,11 +26,9 @@ const GameOffersPage: React.FC = () => {
 
         const smartInfo = profile.smartInfo;
 
-        console.log("**** set Offers: " + smartInfo.gameOffers?.count);
         // Active Offers
         setOffers(smartInfo.gameOffers?.toArray() || []);
 
-        console.log("**** set Groups: " + smartInfo.gameOfferGroups?.count);
         // Active Offer Groups
         setOfferGroups(smartInfo.gameOfferGroups?.toArray() || []);
 
@@ -40,16 +37,10 @@ const GameOffersPage: React.FC = () => {
 
     useEffect(() => {
         // Add event listeners for real-time updates
-        const handleNewOfferActivated = () => refreshOffers();
-        const handleOfferDeactivated = (offerInfo: SmartObjectsOfferInfo, wasPurchased: boolean) => {
-            console.log("OFFER deactivated: " + offerInfo.instanceId + " ?? " + wasPurchased);
-            refreshOffers();
-        }
+        const handleNewOfferActivated = (offerInfo: SmartObjectsOfferInfo) => refreshOffers();
+        const handleOfferDeactivated = (offerInfo: SmartObjectsOfferInfo, wasPurchased: boolean) => refreshOffers();
         const handleNewOfferGroupActivated = (offerGroupInfo: SmartObjectsOfferGroupInfo) => refreshOffers();
-        const handleOfferGroupDeactivated = (offerGroupInfo: SmartObjectsOfferGroupInfo) => {
-            console.log("OFFER Group deactivated");
-            refreshOffers();
-        }
+        const handleOfferGroupDeactivated = (offerGroupInfo: SmartObjectsOfferGroupInfo) => refreshOffers();
 
         Balancy.Callbacks.onNewOfferActivated = handleNewOfferActivated;
         Balancy.Callbacks.onOfferDeactivated = handleOfferDeactivated;
@@ -68,7 +59,6 @@ const GameOffersPage: React.FC = () => {
         };
     }, []);
 
-    console.log("**** render Offers: " + offers.length + " offerGroups = " + offerGroups.length);
     return (
         <div key={refreshKey} style={{ padding: "20px" }}>
             <h2>Game Offers</h2>
