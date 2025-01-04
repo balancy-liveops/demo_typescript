@@ -10,6 +10,8 @@ import SegmentationPage from "./pages/SegmentationPage";
 import AdsPage from "./pages/AdsPage";
 import GameEventsPage from "./pages/GameEventsPage";
 import InventoryPage from "./pages/InventoryPage";
+import GameOffersPage from "./pages/GameOffersPage";
+import { Balancy} from '@balancy/core';
 
 const App: React.FC = () => {
     const [loading, setLoading] = useState(true);
@@ -28,6 +30,12 @@ const App: React.FC = () => {
         loadBalancy();
     }, []);
 
+    const handleReset = () => {
+        // console.log("Resetting the app...");
+        Balancy.Profiles.reset();
+        // Add logic for resetting, e.g., clearing local storage, resetting state, etc.
+    };
+
     if (loading) {
         return (
             <div style={styles.loaderContainer}>
@@ -41,15 +49,19 @@ const App: React.FC = () => {
         <Router>
             <div>
                 <nav style={styles.nav}>
-                    <Link to="/" style={styles.tab}>Home</Link>
-                    <Link to="/info" style={styles.tab}>Info</Link>
-                    <Link to="/ab-tests" style={styles.tab}>AB Tests</Link>
-                    <Link to="/segmentation" style={styles.tab}>Segmentation</Link>
-                    <Link to="/ads" style={styles.tab}>Ads</Link>
-                    <Link to="/game-events" style={styles.tab}>Game Events</Link>
-                    <Link to="/inventory" style={styles.tab}>Inventory</Link>
-                    <Link to="/about" style={styles.tab}>About</Link>
-                    <Link to="/contact" style={styles.tab}>Contact</Link>
+                    <div style={styles.navLeft}>
+                        <Link to="/" style={styles.tab}>Home</Link>
+                        <Link to="/info" style={styles.tab}>Info</Link>
+                        <Link to="/ab-tests" style={styles.tab}>AB Tests</Link>
+                        <Link to="/segmentation" style={styles.tab}>Segmentation</Link>
+                        <Link to="/ads" style={styles.tab}>Ads</Link>
+                        <Link to="/game-events" style={styles.tab}>Game Events</Link>
+                        <Link to="/offers" style={styles.tab}>Offers</Link>
+                        <Link to="/inventory" style={styles.tab}>Inventory</Link>
+                        <Link to="/about" style={styles.tab}>About</Link>
+                        <Link to="/contact" style={styles.tab}>Contact</Link>
+                    </div>
+                    <button style={styles.resetButton} onClick={handleReset}>Reset</button>
                 </nav>
 
                 <div style={styles.content}>
@@ -60,6 +72,7 @@ const App: React.FC = () => {
                         <Route path="/segmentation" element={<SegmentationPage />} />
                         <Route path="/ads" element={<AdsPage />} />
                         <Route path="/game-events" element={<GameEventsPage />} />
+                        <Route path="/offers" element={<GameOffersPage />} />
                         <Route path="/inventory" element={<InventoryPage />} />
                         <Route path="/about" element={<AboutPage />} />
                         <Route path="/contact" element={<ContactPage />} />
@@ -73,15 +86,28 @@ const App: React.FC = () => {
 const styles: { [key: string]: React.CSSProperties } = {
     nav: {
         display: 'flex',
-        justifyContent: 'center',
+        justifyContent: 'space-between', // Adjust for reset button
+        alignItems: 'center',
         backgroundColor: '#f0f0f0',
         padding: '10px',
     },
+    navLeft: {
+        display: 'flex',
+        gap: '10px',
+    },
     tab: {
-        margin: '0 15px',
+        margin: '0 10px',
         textDecoration: 'none',
         color: '#007bff',
         fontWeight: 'bold',
+    },
+    resetButton: {
+        backgroundColor: '#dc3545', // Red button
+        color: '#fff',
+        border: 'none',
+        borderRadius: '4px',
+        padding: '8px 16px',
+        cursor: 'pointer',
     },
     content: {
         padding: '20px',
@@ -115,4 +141,5 @@ function addKeyframes() {
     `;
     document.head.appendChild(style);
 }
+
 export default App;

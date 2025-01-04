@@ -14,7 +14,7 @@ const EventView: React.FC<EventViewProps> = ({ gameEvent, isActive }) => {
 
     return (
         <div style={styles.container}>
-            <span style={styles.name}>{gameEvent.name.getValue()}</span>
+            <span style={styles.name}>{gameEvent.name.value}</span>
             <span style={styles.time}>{timeText}</span>
         </div>
     );

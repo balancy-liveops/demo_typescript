@@ -26,7 +26,7 @@ const InventorySlotView: React.FC<InventorySlotViewProps> = ({ slot }) => {
         <div style={styles.slotContainer}>
             {slot.item && slot.item.item ? (
                 <>
-                    <h4>{slot.item.item.name.getValue()}</h4>
+                    <h4>{slot.item.item.name.value}</h4>
                     <p>ID: {slot.item.item.unnyId}</p>
                     <p>Amount: x{amount}</p>
                     <div style={styles.buttons}>
