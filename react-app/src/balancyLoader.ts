@@ -10,16 +10,17 @@ export const initializeBalancy = async (): Promise<void> => {
     });
 
     config.platform = Platform.AndroidGooglePlay;
-    config.deviceId = 'TestDevice';
+    //config.deviceId = 'TestDevice';
+    config.deviceId = 'DE2309EA-0E81-531C-BDDC-D35BA4C9FA16';
     config.customId = 'Custom456';
     config.appVersion = '1.0.0';
     config.engineVersion = 'React_1.0';
 
     // Create a promise that resolves when Balancy is fully initialized
     const initializationPromise = new Promise<void>((resolve, reject) => {
-        Balancy.Callbacks.onDataUpdated = (status) => {
+        Balancy.Callbacks.onDataUpdated.subscribe((status) => {
             console.log('=== Data Updated Callback ===');
-            if (status.isCloudSynchronized) {
+            if (status.isCloudSynced) {
                 const systemProfile = Balancy.Profiles.system;
 
                 if (systemProfile) {
@@ -52,7 +53,7 @@ export const initializeBalancy = async (): Promise<void> => {
 
                 resolve(); // Balancy is fully initialized
             }
-        };
+        });
     });
 
     await Balancy.Main.init(config);
