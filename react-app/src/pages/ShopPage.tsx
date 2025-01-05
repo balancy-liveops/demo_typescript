@@ -61,12 +61,12 @@ const ShopPage: React.FC = () => {
     };
 
     useEffect(() => {
-        Balancy.Callbacks.onShopUpdated = refresh;
+        const shopUpdatedId = Balancy.Callbacks.onShopUpdated.subscribe(refresh);
 
         refresh();
 
         return () => {
-            Balancy.Callbacks.onShopUpdated = null;
+            Balancy.Callbacks.onShopUpdated.unsubscribe(shopUpdatedId);
         };
     }, []);
 

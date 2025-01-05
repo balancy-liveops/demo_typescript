@@ -38,8 +38,8 @@ const GameEventsPage: React.FC = () => {
         const handleNewEventActivated = (eventInfo: SmartObjectsEventInfo) => refreshEvents();
         const handleEventDeactivated = (eventInfo: SmartObjectsEventInfo) => refreshEvents();
 
-        Balancy.Callbacks.onNewEventActivated = handleNewEventActivated;
-        Balancy.Callbacks.onEventDeactivated = handleEventDeactivated;
+        const eventActivatedId = Balancy.Callbacks.onNewEventActivated.subscribe(handleNewEventActivated);
+        const eventDeactivatedId = Balancy.Callbacks.onEventDeactivated.subscribe(handleEventDeactivated);
 
         refreshEvents();
 
@@ -48,8 +48,8 @@ const GameEventsPage: React.FC = () => {
         }, 1000); // Refresh every second
 
         return () => {
-            Balancy.Callbacks.onNewEventActivated = null;
-            Balancy.Callbacks.onEventDeactivated = null;
+            Balancy.Callbacks.onNewEventActivated.unsubscribe(eventActivatedId);
+            Balancy.Callbacks.onEventDeactivated.unsubscribe(eventDeactivatedId);
 
             clearInterval(intervalId); // Clear interval on unmount
         };

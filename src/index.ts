@@ -2,8 +2,8 @@ import {AppConfig, Balancy, Environment, LaunchType, Platform,} from '@balancy/c
 import {FileHelperClass} from "./file-helper.class";
 
 function subscribeToCallbacks() {
-    Balancy.Callbacks.onDataUpdated = (status) => {
-        if (status.isCloudSynchronized) {
+    Balancy.Callbacks.onDataUpdated.subscribe((status) => {
+        if (status.isCloudSynced) {
             console.log("=== Data is synchronized with cloud ===");
 
             const systemProfile = Balancy.Profiles.system;
@@ -39,7 +39,7 @@ function subscribeToCallbacks() {
                 }
             }
         }
-    }
+    });
 }
 
 (async () => {

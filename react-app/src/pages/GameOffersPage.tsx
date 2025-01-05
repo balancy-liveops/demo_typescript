@@ -42,20 +42,20 @@ const GameOffersPage: React.FC = () => {
         const handleNewOfferGroupActivated = (offerGroupInfo: SmartObjectsOfferGroupInfo) => refreshOffers();
         const handleOfferGroupDeactivated = (offerGroupInfo: SmartObjectsOfferGroupInfo) => refreshOffers();
 
-        Balancy.Callbacks.onNewOfferActivated = handleNewOfferActivated;
-        Balancy.Callbacks.onOfferDeactivated = handleOfferDeactivated;
-        Balancy.Callbacks.onNewOfferGroupActivated = handleNewOfferGroupActivated;
-        Balancy.Callbacks.onOfferGroupDeactivated = handleOfferGroupDeactivated;
+        const offerActivatedId = Balancy.Callbacks.onNewOfferActivated.subscribe(handleNewOfferActivated);
+        const offerDeactivatedId = Balancy.Callbacks.onOfferDeactivated.subscribe(handleOfferDeactivated);
+        const offerGroupActivatedId = Balancy.Callbacks.onNewOfferGroupActivated.subscribe(handleNewOfferGroupActivated);
+        const offerGroupDeactivatedId = Balancy.Callbacks.onOfferGroupDeactivated.subscribe(handleOfferGroupDeactivated);
 
         // Refresh offers initially
         refreshOffers();
 
         return () => {
             // Cleanup event listeners
-            Balancy.Callbacks.onNewOfferActivated = null;
-            Balancy.Callbacks.onOfferDeactivated = null;
-            Balancy.Callbacks.onNewOfferGroupActivated = null;
-            Balancy.Callbacks.onOfferGroupDeactivated = null;
+            Balancy.Callbacks.onNewOfferActivated.unsubscribe(offerActivatedId);
+            Balancy.Callbacks.onOfferDeactivated.unsubscribe(offerDeactivatedId);
+            Balancy.Callbacks.onNewOfferGroupActivated.unsubscribe(offerGroupActivatedId);
+            Balancy.Callbacks.onOfferGroupDeactivated.unsubscribe(offerGroupDeactivatedId);
         };
     }, []);
 
