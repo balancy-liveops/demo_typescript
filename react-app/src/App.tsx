@@ -12,6 +12,7 @@ import GameOffersPage from "./pages/GameOffersPage";
 import { Balancy} from '@balancy/core';
 import ShopPage from "./pages/ShopPage";
 import UserPropertiesPage from "./pages/UserPropertiesPage";
+import LanguagesPage from "./pages/LanguagesPage";
 
 const App: React.FC = () => {
     const [loading, setLoading] = useState(true);
@@ -64,6 +65,7 @@ const App: React.FC = () => {
                         <Link to="/shop" style={styles.tab}>Shop</Link>
                         <Link to="/inventory" style={styles.tab}>Inventory</Link>
                         <Link to="/user-properties" style={styles.tab}>User Properties</Link>
+                        <Link to="/languages" style={styles.tab}>Languages</Link>
                     </div>
                     <button style={styles.resetButton} onClick={handleReset}>Reset</button>
                 </nav>
@@ -80,6 +82,7 @@ const App: React.FC = () => {
                         <Route path="/shop" element={<ShopPage />} />
                         <Route path="/inventory" element={<InventoryPage />} />
                         <Route path="/user-properties" element={<UserPropertiesPage />} />
+                        <Route path="/languages" element={<LanguagesPage />} />
                     </Routes>
                 </div>
             </div>
