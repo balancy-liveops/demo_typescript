@@ -9,7 +9,7 @@ import {
 } from "@balancy/core";
 import { TimeFormatter } from "../TimeFormatter";
 import {Utils} from "../Utils";
-import {BalancyPurchaseProductResponseData} from "../../../../plugin_cpp_typescript/packages/wasm"; // Assuming formatTime is in a utils folder
+import {BalancyPurchaseProductResponseData} from "@balancy/wasm";
 
 interface OfferViewProps {
     offerInfo: SmartObjectsOfferInfo;

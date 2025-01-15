@@ -8,7 +8,7 @@ import {
 import { TimeFormatter } from "../TimeFormatter"; // Assuming this exists
 import { Utils } from "../Utils"; // Assuming this exists
 import { Balancy } from "@balancy/core";
-import { BalancyPurchaseProductResponseData } from "../../../../plugin_cpp_typescript/packages/wasm";
+import { BalancyPurchaseProductResponseData } from "@balancy/wasm";
 import StoreItemView from "./StoreItemView";
 
 interface OfferGroupViewProps {

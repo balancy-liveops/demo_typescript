@@ -6,6 +6,7 @@ import {
     SmartObjectsStoreItem,
     SmartObjectsPriceType, Nullable,
 } from "@balancy/core";
+import {BalancyPurchaseProductResponseData} from "@balancy/wasm";
 import StoreItemView from "./StoreItemView"; // Reuse from previous implementation
 import { Utils } from "../Utils"; // Utility methods
 
@@ -44,7 +45,7 @@ const ShopPage: React.FC = () => {
         // Simulate creating payment info
         const paymentInfo = Utils.createTestPaymentInfo(price);
 
-        const purchaseCompleted = (responseData: any) => {
+        const purchaseCompleted = (responseData: BalancyPurchaseProductResponseData) => {
             console.log("Purchase of", responseData.productId, "success =", responseData.success);
             if (!responseData.success) {
                 console.error("ErrorCode:", responseData.errorCode);
