@@ -22,4 +22,4 @@ node_modules/
 # WebStorm
 #//////////////////////////
 .idea/
-balancy-test-root
+/react-app/.balancy

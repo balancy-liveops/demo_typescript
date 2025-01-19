@@ -1,4 +1,5 @@
 import { AppConfig, Balancy, Environment, Platform } from '@balancy/core';
+import {FileHelperClassBrowser} from "./FileHelperClassBrowser";
 
 export const initializeBalancy = async (): Promise<void> => {
     console.log('Initializing Balancy...');
@@ -19,7 +20,7 @@ export const initializeBalancy = async (): Promise<void> => {
     // Create a promise that resolves when Balancy is fully initialized
     const initializationPromise = new Promise<void>((resolve, reject) => {
         Balancy.Callbacks.onDataUpdated.subscribe((status) => {
-            console.log('=== Data Updated Callback ===');
+            console.log(`=== Data Updated Callback === ${status.isCloudSynced} ; isCMSUpdated = ${status.isCMSUpdated} ; isProfileUpdated = ${status.isProfileUpdated}`);
             if (status.isCloudSynced) {
                 const systemProfile = Balancy.Profiles.system;
 
@@ -55,6 +56,10 @@ export const initializeBalancy = async (): Promise<void> => {
             }
         });
     });
+
+    await Balancy.Main.initializeFileHelper(new FileHelperClassBrowser({
+        cachePath: '.balancy'
+    }));
 
     await Balancy.Main.init(config);
     console.log('Balancy Initialized, waiting for data synchronization...');

@@ -15,8 +15,8 @@
   },
   "proxy": "http://localhost:3000",
   "devDependencies": {
-    "@balancy/cli": "^1.0.5",
-    "@balancy/core": "^1.0.5",
+    "@balancy/cli": "^1.0.8",
+    "@balancy/core": "^1.0.8",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "typescript": "^4.9.5"
