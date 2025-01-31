@@ -13,6 +13,9 @@ import { Balancy} from '@balancy/core';
 import ShopPage from "./pages/ShopPage";
 import UserPropertiesPage from "./pages/UserPropertiesPage";
 import LanguagesPage from "./pages/LanguagesPage";
+import TimeCheatPage from "./pages/TimeCheatPage";
+import DailyBonusPage from "./pages/DailyBonusPage";
+import BalancyStatus from "./pages/BalancyStatus";
 
 const App: React.FC = () => {
     const [loading, setLoading] = useState(true);
@@ -64,11 +67,15 @@ const App: React.FC = () => {
                         <Link to="/offers" style={styles.tab}>Offers</Link>
                         <Link to="/shop" style={styles.tab}>Shop</Link>
                         <Link to="/inventory" style={styles.tab}>Inventory</Link>
+                        <Link to="/daily-bonus" style={styles.tab}>Daily Bonus</Link>
                         <Link to="/user-properties" style={styles.tab}>User Properties</Link>
                         <Link to="/languages" style={styles.tab}>Languages</Link>
+                        <Link to="/time" style={styles.tab}>Time</Link>
                     </div>
                     <button style={styles.resetButton} onClick={handleReset}>Reset</button>
                 </nav>
+
+                <BalancyStatus />
 
                 <div style={styles.content}>
                     <Routes>
@@ -81,8 +88,10 @@ const App: React.FC = () => {
                         <Route path="/offers" element={<GameOffersPage />} />
                         <Route path="/shop" element={<ShopPage />} />
                         <Route path="/inventory" element={<InventoryPage />} />
+                        <Route path="/daily-bonus" element={<DailyBonusPage />} />
                         <Route path="/user-properties" element={<UserPropertiesPage />} />
                         <Route path="/languages" element={<LanguagesPage />} />
+                        <Route path="/time" element={<TimeCheatPage />} />
                     </Routes>
                 </div>
             </div>
