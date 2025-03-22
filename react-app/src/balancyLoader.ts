@@ -1,20 +1,34 @@
 import { AppConfig, Balancy, Environment, Platform } from '@balancy/core';
-import {FileHelperClassBrowser} from "./FileHelperClassBrowser";
+import { FileHelperClassBrowser } from "./FileHelperClassBrowser";
 
-export const initializeBalancy = async (): Promise<void> => {
-    console.log('Initializing Balancy...');
+export interface BalancyConfigParams {
+    apiGameId: string;
+    publicKey: string;
+    environment: Environment;
+    deviceId?: string;
+    appVersion?: string;
+}
+
+export const initializeBalancy = async (configParams: BalancyConfigParams): Promise<void> => {
+    console.log('Initializing Balancy with params:', configParams);
 
     const config = AppConfig.create({
-        apiGameId: '6f5d4614-36c0-11ef-9145-066676c39f77',
-        publicKey: 'MzA5MGY0NWUwNGE5MTk5ZDU4MDAzNT',
-        environment: Environment.Development,
+        apiGameId: configParams.apiGameId,
+        publicKey: configParams.publicKey,
+        environment: configParams.environment,
     });
 
+    // Set platform (fixed value)
     config.platform = Platform.AndroidGooglePlay;
-    //config.deviceId = 'TestDevice';
-    config.deviceId = 'DE2309EA-0E81-531C-BDDC-D35BA4C9FA16';
+
+    // Set deviceId - use provided or generate/retrieve one
+    config.deviceId = configParams.deviceId || getOrCreateDeviceId();
+
+    // Fixed customId for now
     config.customId = 'Custom456';
-    config.appVersion = '1.0.0';
+
+    // Set app version
+    config.appVersion = configParams.appVersion || '1.0.0';
     config.engineVersion = 'React_1.0';
 
     // Create a promise that resolves when Balancy is fully initialized
@@ -32,24 +46,6 @@ export const initializeBalancy = async (): Promise<void> => {
                     console.log('First Login:', generalInfo.firstLoginTime);
                     console.log('Session:', generalInfo.session);
                     console.log('PlayTime:', generalInfo.playTime);
-
-                    // Uncomment for more detailed information
-                    // console.log('*** Active Events ***');
-                    // systemProfile.smartInfo.gameEvents.forEach((event, i) => {
-                    //     console.log(`${i + 1}) ${event.gameEvent?.name?.getValue()}`);
-                    // });
-                    //
-                    // console.log('*** Active Offers ***');
-                    // systemProfile.smartInfo.gameOffers.forEach((offer, i) => {
-                    //     console.log(`${i + 1}) ${offer.gameOffer?.name?.getValue()}`);
-                    // });
-                    //
-                    // console.log('*** A/B Tests ***');
-                    // systemProfile.testsInfo.tests.forEach((test, i) => {
-                    //     console.log(
-                    //         `${i + 1}) ${test.test?.name} - Variant: ${test.variant?.name}`
-                    //     );
-                    // });
                 }
 
                 resolve(); // Balancy is fully initialized
@@ -68,3 +64,20 @@ export const initializeBalancy = async (): Promise<void> => {
     await initializationPromise;
     console.log('Balancy Data Synchronized and Ready!');
 };
+
+// Helper function to get or create a persistent device ID
+function getOrCreateDeviceId(): string {
+    const storageKey = 'balancy_device_id';
+    let deviceId = localStorage.getItem(storageKey);
+
+    if (!deviceId) {
+        // Generate a UUID v4
+        deviceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+        localStorage.setItem(storageKey, deviceId);
+    }
+
+    return deviceId;
+}
