@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link, Navigate, useLocation } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import ConnectPage from './pages/ConnectPage';
 import { initializeBalancy, BalancyConfigParams } from './balancyLoader';
@@ -18,24 +18,140 @@ import TimeCheatPage from "./pages/TimeCheatPage";
 import DailyBonusPage from "./pages/DailyBonusPage";
 import BalancyStatus from "./pages/BalancyStatus";
 
+// Storage key for saving connection info
+const STORAGE_KEY = 'balancy_connection_info';
+
 const App: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [isConnected, setIsConnected] = useState(false);
     const [currentConfig, setCurrentConfig] = useState<BalancyConfigParams | null>(null);
     const initializedRef = React.useRef(false);
 
-    useEffect(() => {
-        // Check for configuration parameters in URL on initial load
+    // Function to update URL with config params without navigation
+    const updateUrlWithConfig = (config: BalancyConfigParams) => {
+        const url = new URL(window.location.href);
+
+        // Add all config parameters to URL
+        url.searchParams.set('game_id', config.apiGameId);
+        url.searchParams.set('public_key', config.publicKey);
+        url.searchParams.set('environment', environmentToString(config.environment));
+
+        if (config.deviceId) {
+            url.searchParams.set('device_id', config.deviceId);
+        }
+
+        if (config.appVersion) {
+            url.searchParams.set('app_version', config.appVersion);
+        }
+
+        // Update URL without navigation
+        window.history.replaceState({}, '', url.toString());
+    };
+
+    // Function to save connection info to localStorage
+    const saveConnectionInfo = (config: BalancyConfigParams) => {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+        } catch (error) {
+            console.error('Error saving connection info to localStorage:', error);
+        }
+    };
+
+    // Function to load connection info from localStorage
+    const loadConnectionInfo = (): BalancyConfigParams | null => {
+        try {
+            const storedInfo = localStorage.getItem(STORAGE_KEY);
+            if (!storedInfo) return null;
+
+            const config = JSON.parse(storedInfo) as BalancyConfigParams;
+
+            // Ensure environment is parsed correctly (it might be stored as a number)
+            if (typeof config.environment === 'string') {
+                config.environment = parseEnvironment(config.environment);
+            }
+
+            return config;
+        } catch (error) {
+            console.error('Error loading connection info from localStorage:', error);
+            return null;
+        }
+    };
+
+    // Helper functions for environment conversion
+    const parseEnvironment = (value: string): Environment => {
+        switch (value.toLowerCase()) {
+            case 'production':
+                return Environment.Production;
+            case 'stage':
+                return Environment.Stage;
+            default:
+                return Environment.Development;
+        }
+    };
+
+    const environmentToString = (env: Environment): string => {
+        switch (env) {
+            case Environment.Production:
+                return 'production';
+            case Environment.Stage:
+                return 'stage';
+            default:
+                return 'development';
+        }
+    };
+
+    // Function to extract config from URL parameters
+    const getConfigFromUrl = (): BalancyConfigParams | null => {
         const queryParams = new URLSearchParams(window.location.search);
         const urlGameId = queryParams.get('game_id');
+        const urlPublicKey = queryParams.get('public_key');
 
-        if (urlGameId) {
-            // If game_id is in URL, attempt auto-connect
-            // The full config will be built in the ConnectPage component
-            addKeyframes();
+        // Return null if required parameters are missing
+        if (!urlGameId || !urlPublicKey) return null;
+
+        const urlEnvironment = queryParams.get('environment');
+        const urlDeviceId = queryParams.get('device_id');
+        const urlAppVersion = queryParams.get('app_version');
+
+        return {
+            apiGameId: urlGameId,
+            publicKey: urlPublicKey,
+            environment: urlEnvironment ? parseEnvironment(urlEnvironment) : Environment.Development,
+            deviceId: urlDeviceId || undefined,
+            appVersion: urlAppVersion || '1.0.0'
+        };
+    };
+
+    // Function to handle route changes and ensure URL params persist
+    const handleRouteChange = () => {
+        // If connected and config exists, ensure URL params are set
+        if (isConnected && currentConfig) {
+            updateUrlWithConfig(currentConfig);
+        }
+    };
+
+    useEffect(() => {
+        if (initializedRef.current) return;
+        initializedRef.current = true;
+
+        addKeyframes();
+
+        // Check URL parameters first
+        const urlConfig = getConfigFromUrl();
+
+        if (urlConfig) {
+            // If URL has all required params, connect with them
+            connectToBalancy(urlConfig);
         } else {
-            // Just add keyframes if no auto-connect
-            addKeyframes();
+            // Otherwise try to load from localStorage
+            const storedConfig = loadConnectionInfo();
+
+            if (storedConfig) {
+                // Update URL with stored config
+                updateUrlWithConfig(storedConfig);
+                // And connect
+                connectToBalancy(storedConfig);
+            }
         }
     }, []);
 
@@ -50,10 +166,11 @@ const App: React.FC = () => {
             setIsConnected(true);
             setCurrentConfig(config);
 
-            // Update URL with game_id for easy sharing/bookmarking
-            const url = new URL(window.location.href);
-            url.searchParams.set('game_id', config.apiGameId);
-            window.history.replaceState({}, '', url.toString());
+            // Save connection info to localStorage
+            saveConnectionInfo(config);
+
+            // Update URL with config params
+            updateUrlWithConfig(config);
         } catch (error) {
             console.error('Error initializing Balancy:', error);
             alert('Failed to connect to Balancy. Please check your configuration and try again.');
@@ -64,17 +181,16 @@ const App: React.FC = () => {
 
     const disconnectFromBalancy = () => {
         // Handle disconnection
-        Balancy.Profiles.reset();
+        // Balancy.Profiles.reset();
         setIsConnected(false);
         setCurrentConfig(null);
 
-        // Remove game_id from URL
+        // Remove stored connection info
+        localStorage.removeItem(STORAGE_KEY);
+
+        // Remove params from URL
         const url = new URL(window.location.href);
-        url.searchParams.delete('game_id');
-        url.searchParams.delete('public_key');
-        url.searchParams.delete('environment');
-        url.searchParams.delete('device_id');
-        url.searchParams.delete('app_version');
+        url.search = '';
         window.history.replaceState({}, document.title, url.toString());
     };
 
@@ -108,6 +224,7 @@ const App: React.FC = () => {
 
     return (
         <Router>
+            <RouteChangeHandler onRouteChange={handleRouteChange} />
             <div>
                 {isConnected && currentConfig ? (
                     // Connected state UI
@@ -169,6 +286,17 @@ const App: React.FC = () => {
             </div>
         </Router>
     );
+};
+
+// Helper component to detect route changes
+const RouteChangeHandler: React.FC<{ onRouteChange: () => void }> = ({ onRouteChange }) => {
+    const location = useLocation();
+
+    useEffect(() => {
+        onRouteChange();
+    }, [location, onRouteChange]);
+
+    return null;
 };
 
 const styles: { [key: string]: React.CSSProperties } = {

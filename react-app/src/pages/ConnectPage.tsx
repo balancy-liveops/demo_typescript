@@ -17,66 +17,80 @@ const ConnectPage: React.FC<ConnectPageProps> = ({ onConnect }) => {
 
     // Basic form validation
     const [isValid, setIsValid] = useState(false);
+    const [loadedFromStorage, setLoadedFromStorage] = useState(false);
 
     useEffect(() => {
-        // Check for game_id and other parameters in URL
-        const queryParams = new URLSearchParams(window.location.search);
-        const urlGameId = queryParams.get('game_id');
-        const urlPublicKey = queryParams.get('public_key');
-        const urlEnvironment = queryParams.get('environment');
-        const urlDeviceId = queryParams.get('device_id');
-        const urlAppVersion = queryParams.get('app_version');
+        // Function to initialize form from URL or localStorage
+        const initializeForm = () => {
+            // Check for URL parameters first
+            const queryParams = new URLSearchParams(window.location.search);
+            const urlGameId = queryParams.get('game_id');
+            const urlPublicKey = queryParams.get('public_key');
 
-        // Update config with URL parameters if available
-        const updatedConfig = { ...config };
-        let updateNeeded = false;
+            if (urlGameId && urlPublicKey) {
+                // We have the required parameters in URL
+                const urlEnvironment = queryParams.get('environment');
+                const urlDeviceId = queryParams.get('device_id');
+                const urlAppVersion = queryParams.get('app_version');
 
-        if (urlGameId) {
-            updatedConfig.apiGameId = urlGameId;
-            updateNeeded = true;
-        }
+                const updatedConfig = {
+                    apiGameId: urlGameId,
+                    publicKey: urlPublicKey,
+                    environment: urlEnvironment ? parseEnvironment(urlEnvironment) : Environment.Development,
+                    deviceId: urlDeviceId || '',
+                    appVersion: urlAppVersion || '1.0.0'
+                };
 
-        if (urlPublicKey) {
-            updatedConfig.publicKey = urlPublicKey;
-            updateNeeded = true;
-        }
-
-        if (urlEnvironment) {
-            const env = parseEnvironment(urlEnvironment);
-            if (env !== null) {
-                updatedConfig.environment = env;
-                updateNeeded = true;
+                setConfig(updatedConfig);
+                return;
             }
-        }
 
-        if (urlDeviceId) {
-            updatedConfig.deviceId = urlDeviceId;
-            updateNeeded = true;
-        }
+            // Otherwise check localStorage
+            try {
+                const storedConfig = localStorage.getItem('balancy_connection_info');
+                if (storedConfig) {
+                    const parsedConfig = JSON.parse(storedConfig) as BalancyConfigParams;
 
-        if (urlAppVersion) {
-            updatedConfig.appVersion = urlAppVersion;
-            updateNeeded = true;
-        }
+                    // Ensure environment is correctly parsed
+                    if (typeof parsedConfig.environment === 'string') {
+                        parsedConfig.environment = parseEnvironment(parsedConfig.environment as unknown as string);
+                    }
 
-        if (updateNeeded) {
-            setConfig(updatedConfig);
-        }
+                    setConfig(parsedConfig);
+                    setLoadedFromStorage(true);
+                }
+            } catch (error) {
+                console.error('Error loading from localStorage:', error);
+            }
 
-        // Retrieve device ID from localStorage if available
-        const storedDeviceId = localStorage.getItem('balancy_device_id');
-        if (storedDeviceId && !updatedConfig.deviceId) {
-            setConfig(prev => ({
-                ...prev,
-                deviceId: storedDeviceId
-            }));
-        }
+            // Fall back to stored device ID if available and no device ID is set
+            const storedDeviceId = localStorage.getItem('balancy_device_id');
+            if (storedDeviceId && !config.deviceId) {
+                setConfig(prev => ({
+                    ...prev,
+                    deviceId: storedDeviceId
+                }));
+            }
+        };
+
+        initializeForm();
     }, []);
 
     // Check if required fields are filled
     useEffect(() => {
         setIsValid(!!config.apiGameId && !!config.publicKey);
-    }, [config]);
+
+        // If we loaded from storage and have valid credentials, attempt auto-connect
+        if (loadedFromStorage && !!config.apiGameId && !!config.publicKey) {
+            // Add a small delay to ensure UI renders first
+            const timer = setTimeout(() => {
+                onConnect(config);
+                setLoadedFromStorage(false); // Reset flag to prevent reconnecting
+            }, 100);
+
+            return () => clearTimeout(timer);
+        }
+    }, [config, loadedFromStorage, onConnect]);
 
     const handleConnect = () => {
         if (isValid) {
@@ -133,6 +147,20 @@ const ConnectPage: React.FC<ConnectPageProps> = ({ onConnect }) => {
             ...prev,
             deviceId: newDeviceId
         }));
+    };
+
+    // Handle previous session data clearing
+    const clearStoredSession = () => {
+        localStorage.removeItem('balancy_connection_info');
+
+        // Reset form to defaults
+        setConfig({
+            apiGameId: '',
+            publicKey: '',
+            environment: Environment.Development,
+            deviceId: '',
+            appVersion: '1.0.0'
+        });
     };
 
     return (
@@ -221,16 +249,28 @@ const ConnectPage: React.FC<ConnectPageProps> = ({ onConnect }) => {
                     />
                 </div>
 
-                <button
-                    onClick={handleConnect}
-                    disabled={!isValid}
-                    style={{
-                        ...styles.connectButton,
-                        ...(isValid ? {} : styles.disabledButton)
-                    }}
-                >
-                    Connect
-                </button>
+                <div style={styles.buttonContainer}>
+                    <button
+                        onClick={handleConnect}
+                        disabled={!isValid}
+                        style={{
+                            ...styles.connectButton,
+                            ...(isValid ? {} : styles.disabledButton)
+                        }}
+                    >
+                        Connect
+                    </button>
+
+                    {loadedFromStorage && (
+                        <button
+                            onClick={clearStoredSession}
+                            style={styles.clearButton}
+                            type="button"
+                        >
+                            Clear Saved Session
+                        </button>
+                    )}
+                </div>
             </div>
 
             <div style={styles.instructions}>
@@ -241,6 +281,12 @@ const ConnectPage: React.FC<ConnectPageProps> = ({ onConnect }) => {
                     <li>Click "Connect" to initialize Balancy</li>
                 </ol>
                 <p style={styles.requiredNote}>* Required fields</p>
+
+                {loadedFromStorage && (
+                    <div style={styles.sessionNote}>
+                        <p>✓ Session data loaded from previous connection</p>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -316,6 +362,11 @@ const styles: { [key: string]: React.CSSProperties } = {
         cursor: 'pointer',
         whiteSpace: 'nowrap',
     },
+    buttonContainer: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        marginTop: '10px',
+    },
     connectButton: {
         backgroundColor: '#007bff',
         color: '#fff',
@@ -325,7 +376,17 @@ const styles: { [key: string]: React.CSSProperties } = {
         fontSize: '16px',
         cursor: 'pointer',
         transition: 'background-color 0.2s',
-        marginTop: '10px',
+        flex: '1',
+        marginRight: '10px',
+    },
+    clearButton: {
+        backgroundColor: '#6c757d',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '4px',
+        padding: '12px 15px',
+        fontSize: '14px',
+        cursor: 'pointer',
     },
     disabledButton: {
         backgroundColor: '#cccccc',
@@ -354,6 +415,13 @@ const styles: { [key: string]: React.CSSProperties } = {
         fontSize: '14px',
         color: '#666',
         marginTop: '0',
+    },
+    sessionNote: {
+        marginTop: '15px',
+        padding: '10px 15px',
+        backgroundColor: '#d4edda',
+        borderRadius: '4px',
+        color: '#155724',
     },
 };
 
