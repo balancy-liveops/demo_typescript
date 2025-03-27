@@ -182,6 +182,7 @@ const App: React.FC = () => {
     const disconnectFromBalancy = () => {
         // Handle disconnection
         // Balancy.Profiles.reset();
+        Balancy.Main.stop();
         setIsConnected(false);
         setCurrentConfig(null);
 
