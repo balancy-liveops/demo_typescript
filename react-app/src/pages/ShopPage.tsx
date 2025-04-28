@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
     Balancy,
+    SmartObjectsGameShop,
     SmartObjectsShopPage,
     SmartObjectsShopSlot,
     SmartObjectsStoreItem,
@@ -8,11 +9,12 @@ import {
 } from "@balancy/core";
 import {BalancyPurchaseProductResponseData} from "@balancy/wasm";
 import StoreItemView from "./StoreItemView"; // Reuse from previous implementation
-import { Utils } from "../Utils"; // Utility methods
+import { Utils } from "../Utils";
 
 const ShopPage: React.FC = () => {
     const [shopPages, setShopPages] = useState<SmartObjectsShopPage[]>([]);
     const [activePage, setActivePage] = useState<SmartObjectsShopPage | null>(null);
+    const [activeShop, setActiveShop] = useState<SmartObjectsGameShop | null>(null);
     const [refreshKey, setRefreshKey] = useState(0);
 
     const refresh = () => {
@@ -25,6 +27,7 @@ const ShopPage: React.FC = () => {
         if (shops && shops.gameShops && shops.gameShops.count > 0) {
             const activeShop = shops.gameShops.get(0);
             setShopPages(activeShop.activePages?.toArray() || []);
+            setActiveShop(activeShop);
             setActivePage(activeShop.activePages?.get(0) || null);
         }
 
@@ -73,7 +76,7 @@ const ShopPage: React.FC = () => {
 
     return (
         <div key={refreshKey} style={{ padding: "20px" }}>
-            <h2>Shop</h2>
+            <h2>{"Shop: " + activeShop?.shop?.name.value}</h2>
             {/* Horizontal Scroll for Shop Pages */}
             <div style={{ display: "flex", overflowX: "auto", gap: "10px", marginBottom: "20px" }}>
                 {shopPages.map((page) => (
