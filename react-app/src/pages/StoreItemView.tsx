@@ -1,5 +1,5 @@
 import React from "react";
-import { Nullable, SmartObjectsStoreItem } from "@balancy/core";
+import { Nullable, SmartObjectsStoreItem, SmartObjectsPriceType } from "@balancy/core";
 
 interface StoreItemViewProps {
     storeItem: Nullable<SmartObjectsStoreItem>;
@@ -15,8 +15,29 @@ const StoreItemView: React.FC<StoreItemViewProps> = ({ storeItem, canBuy, onBuy 
     };
 
     let priceStr = "N/A";
-    if (storeItem?.price?.product)
-        priceStr = `$ ${storeItem?.price?.product?.price.toFixed(2)}`;
+    switch (storeItem?.price?.type) {
+        case SmartObjectsPriceType.Hard:
+            priceStr = storeItem?.price?.product ? `$ ${storeItem?.price?.product?.price.toFixed(2)}` : `N/A`;
+            break;
+        case SmartObjectsPriceType.Soft:
+            let price = storeItem?.price?.items;
+            if (price && price.length > 0) {
+                priceStr = '';
+                for (let i = 0; i < price.length; i++) {
+                    let p = price[i];
+                    if (p && p.item) {
+                        priceStr += `${p.item.name.value} x ${p.count} \n`;
+                        break;
+                    }
+                }
+            }
+            break;
+        case SmartObjectsPriceType.Ads:
+            priceStr = `▶️ ${storeItem?.price?.ads}`;
+            break;
+        default:
+            priceStr = "N/A";
+    }
 
     return (
         <div
