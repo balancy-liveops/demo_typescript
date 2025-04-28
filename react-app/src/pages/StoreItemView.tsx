@@ -26,6 +26,10 @@ const StoreItemView: React.FC<StoreItemViewProps> = ({ storeItem, canBuy, onBuy 
                 borderRadius: "5px",
                 minWidth: "120px",
                 textAlign: "center",
+                display: "flex",
+                flexDirection: "column", // Arrange elements vertically
+                justifyContent: "space-between", // Space elements within the container
+                // height: "100%", // Ensure the container can expand
             }}
         >
             {/* Name */}
@@ -42,9 +46,23 @@ const StoreItemView: React.FC<StoreItemViewProps> = ({ storeItem, canBuy, onBuy 
                     width: "80px",
                     height: "80px",
                     objectFit: "contain",
-                    margin: "10px 0",
+                    margin: "10px auto", // Center the image horizontally
+                    display: "block", // Ensure it behaves like a block element for centering
                 }}
             />
+            {/* Reward Items List */}
+            {storeItem?.reward?.items && storeItem.reward.items.length > 0 && (
+                <div style={{ marginBottom: "10px" }}>
+                    <p style={{ fontSize: "12px", fontWeight: "bold" }}>Reward Items:</p>
+                    <ul style={{ paddingLeft: "20px", textAlign: "left" }}>
+                        {storeItem.reward.items.map((rewardItem, index) => (
+                            <li key={index} style={{ fontSize: "12px" }}>
+                                {rewardItem?.item?.name?.value} (x{rewardItem?.count})
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
             {/* Buy Button */}
             <button
                 onClick={handleBuy}
@@ -56,6 +74,7 @@ const StoreItemView: React.FC<StoreItemViewProps> = ({ storeItem, canBuy, onBuy 
                     border: "none",
                     borderRadius: "4px",
                     cursor: canBuy ? "pointer" : "not-allowed",
+                    marginTop: "auto", // Pushes the button to the bottom
                 }}
             >
                 {priceStr}
