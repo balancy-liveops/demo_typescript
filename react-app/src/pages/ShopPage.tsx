@@ -25,10 +25,10 @@ const ShopPage: React.FC = () => {
 
         const shops = Balancy.Profiles.system?.shopsInfo;
         if (shops && shops.gameShops && shops.gameShops.count > 0) {
-            const activeShop = shops.gameShops.get(0);
-            setShopPages(activeShop.activePages?.toArray() || []);
+            const activeShop = shops.activeShopInfo;
+            setShopPages(activeShop?.activePages?.toArray() || []);
             setActiveShop(activeShop);
-            setActivePage(activeShop.activePages?.get(0) || null);
+            setActivePage(activeShop?.activePages?.get(0) || null);
         }
 
         setRefreshKey((prev) => prev + 1);

@@ -1,4 +1,4 @@
-import { AppConfig, Balancy, Environment, Platform } from '@balancy/core';
+import { AppConfig, Balancy, Environment, BalancyPlatform } from '@balancy/core';
 import { FileHelperClassBrowser } from "./FileHelperClassBrowser";
 
 export interface BalancyConfigParams {
@@ -19,7 +19,7 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
     });
 
     // Set platform (fixed value)
-    config.platform = Platform.AndroidGooglePlay;
+    config.balancyPlatform = BalancyPlatform.AndroidGooglePlay;
 
     // Set deviceId - use provided or generate/retrieve one
     config.deviceId = configParams.deviceId || getOrCreateDeviceId();
