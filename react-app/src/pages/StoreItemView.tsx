@@ -1,13 +1,14 @@
 import React from "react";
-import { Nullable, SmartObjectsStoreItem, SmartObjectsPriceType } from "@balancy/core";
+import { Nullable, SmartObjectsStoreItem, SmartObjectsPriceType, LiveOpsStoreSlotType } from "@balancy/core";
 
 interface StoreItemViewProps {
     storeItem: Nullable<SmartObjectsStoreItem>;
     canBuy: boolean;
     onBuy: (storeItem: Nullable<SmartObjectsStoreItem>) => void;
+    type?: LiveOpsStoreSlotType;
 }
 
-const StoreItemView: React.FC<StoreItemViewProps> = ({ storeItem, canBuy, onBuy }) => {
+const StoreItemView: React.FC<StoreItemViewProps> = ({ storeItem, canBuy, onBuy, type }) => {
     const handleBuy = () => {
         if (storeItem) {
             onBuy(storeItem);
@@ -39,6 +40,30 @@ const StoreItemView: React.FC<StoreItemViewProps> = ({ storeItem, canBuy, onBuy 
             priceStr = "N/A";
     }
 
+    // Function to get the display text for the slot type
+    const getTypeDisplayText = (slotType: LiveOpsStoreSlotType): string => {
+        switch (slotType) {
+            case LiveOpsStoreSlotType.Default:
+                return "Default";
+            case LiveOpsStoreSlotType.Popular:
+                return "Popular";
+            case LiveOpsStoreSlotType.Best:
+                return "Best";
+            case LiveOpsStoreSlotType.New:
+                return "New";
+            case LiveOpsStoreSlotType.Great:
+                return "Great";
+            case LiveOpsStoreSlotType.Limited:
+                return "Limited";
+            case LiveOpsStoreSlotType.Once:
+                return "Once";
+            case LiveOpsStoreSlotType.Free:
+                return "Free";
+            default:
+                return "";
+        }
+    };
+
     return (
         <div
             style={{
@@ -50,9 +75,36 @@ const StoreItemView: React.FC<StoreItemViewProps> = ({ storeItem, canBuy, onBuy 
                 display: "flex",
                 flexDirection: "column", // Arrange elements vertically
                 justifyContent: "space-between", // Space elements within the container
+                position: "relative", // Enable absolute positioning for the badge
+                overflow: "hidden", // Mask/clip content that goes outside the container
                 // height: "100%", // Ensure the container can expand
             }}
         >
+            {/* Type Badge */}
+            {type !== undefined && type !== LiveOpsStoreSlotType.Default && (
+                <div
+                    style={{
+                        position: "absolute",
+                        top: "8px",
+                        right: "-20px",
+                        backgroundColor: "#007bff",
+                        color: "white",
+                        padding: "4px 8px",
+                        fontSize: "10px",
+                        fontWeight: "bold",
+                        transform: "rotate(45deg)",
+                        transformOrigin: "center",
+                        borderRadius: "3px",
+                        zIndex: 10,
+                        minWidth: "60px",
+                        textAlign: "center",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                    }}
+                >
+                    {getTypeDisplayText(type)}
+                </div>
+            )}
+
             {/* Name */}
             <p style={{ fontWeight: "bold", fontSize: "14px", margin: 0 }}>
                 {storeItem?.name?.value}

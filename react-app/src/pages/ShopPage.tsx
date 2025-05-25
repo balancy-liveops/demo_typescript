@@ -99,7 +99,7 @@ const ShopPage: React.FC = () => {
             </div>
 
             {/* Grid of Slots */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: "10px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: "20px" }}>
                 {activePage?.activeSlots?.toArray().map((shopSlot: SmartObjectsShopSlot) => {
                     const storeItem = shopSlot.slot?.storeItem;
                     if (!storeItem)
@@ -109,6 +109,7 @@ const ShopPage: React.FC = () => {
                             storeItem={storeItem}
                             canBuy={true} // Adjust logic if needed to determine availability
                             onBuy={() => tryToBuySlot(shopSlot.slot?.storeItem)}
+                            type={shopSlot.slot?.type}
                         />);
                     })}
             </div>
