@@ -25,6 +25,7 @@ const BalancyStatus: React.FC = () => {
     }, []);
 
     let serverDate = new Date(serverTime * 1000).toLocaleString("en-GB", {
+        timeZone: "UTC",
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
@@ -35,6 +36,7 @@ const BalancyStatus: React.FC = () => {
     });
 
     let gameDate = new Date(gameTime * 1000).toLocaleString("en-GB", {
+        timeZone: "UTC",
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
