@@ -64,13 +64,10 @@ const OfferGroupView: React.FC<OfferGroupViewProps> = ({ offerGroupInfo }) => {
     };
 
     const handlePurchase = (storeItem: Nullable<SmartObjectsStoreItem>) => {
-        const priceType = storeItem?.price?.type;
-        if (priceType === SmartObjectsPriceType.Hard) {
-            console.log("Hard purchase initiated for:", storeItem?.price?.product?.productId);
-            tryToBuyHard(storeItem, currentOfferGroup, refreshCallback);
-        } else {
-            console.error("Purchase type not supported:", priceType);
-        }
+        Balancy.API.initPurchaseOfferGroup(offerGroupInfo, storeItem, (success, errorMessage) => {
+            console.log("Purchase initialized:", success, errorMessage);
+            refreshCallback();
+        });
     };
 
     return (

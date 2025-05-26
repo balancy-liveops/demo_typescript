@@ -1,15 +1,9 @@
 import React, { useEffect, useState } from "react";
 import {
     Balancy,
-    Nullable,
-    SmartObjectsOfferGroupInfo,
     SmartObjectsOfferInfo,
-    SmartObjectsPriceType,
-    SmartObjectsStoreItem
 } from "@balancy/core";
 import { TimeFormatter } from "../TimeFormatter";
-import {Utils} from "../Utils";
-import {BalancyPurchaseProductResponseData} from "@balancy/wasm";
 
 interface OfferViewProps {
     offerInfo: SmartObjectsOfferInfo;
@@ -36,39 +30,11 @@ const OfferView: React.FC<OfferViewProps> = ({ offerInfo }) => {
         setRefreshKey((prev) => prev + 1);
     };
 
-    const tryToBuyHard = (
-        offerInfo: Nullable<SmartObjectsOfferInfo>,
-        refreshCallback: () => void
-    ) => {
-        const price = offerInfo?.gameOffer?.storeItem?.price;
-        if (!price || !price.product) {
-            console.warn("Invalid price or product information.");
-            return;
-        }
-
-        // Simulate creating payment info
-        const paymentInfo = Utils.createTestPaymentInfo(price);
-
-        const purchaseCompleted = (responseData: BalancyPurchaseProductResponseData) => {
-            console.log("Purchase of", responseData.productId, "success =", responseData.success);
-            if (!responseData.success) {
-                console.error("ErrorCode:", responseData.errorCode);
-                console.error("ErrorMessage:", responseData.errorMessage);
-            }
-            refreshCallback();
-        };
-
-        Balancy.API.hardPurchaseGameOffer(offerInfo, paymentInfo, purchaseCompleted, false);
-    };
-
     const handlePurchase = () => {
-        const priceType = offerInfo.gameOffer?.storeItem?.price?.type;
-        if (priceType === SmartObjectsPriceType.Hard) {
-            console.log("Hard purchase initiated for:", offerInfo.gameOffer?.name?.value);
-            tryToBuyHard(offerInfo, refreshCallback);
-        } else {
-            console.error("Purchase type not supported:", priceType);
-        }
+        Balancy.API.initPurchaseOffer(offerInfo, (success, errorMessage) => {
+            console.log("Purchase initialized:", success, errorMessage);
+            refreshCallback();
+        });
     };
 
     const spriteUrl = offerInfo.gameOffer?.sprite?.getFullUrl() || "";

@@ -7,9 +7,7 @@ import {
     SmartObjectsStoreItem,
     SmartObjectsPriceType, Nullable,
 } from "@balancy/core";
-import {BalancyPurchaseProductResponseData} from "@balancy/wasm";
 import StoreItemView from "./StoreItemView"; // Reuse from previous implementation
-import { Utils } from "../Utils";
 
 const ShopPage: React.FC = () => {
     const [shopPages, setShopPages] = useState<SmartObjectsShopPage[]>([]);
@@ -38,30 +36,11 @@ const ShopPage: React.FC = () => {
         setActivePage(page);
     };
 
-    const tryToBuySlot = (storeItem: Nullable<SmartObjectsStoreItem> | undefined) => {
-        const price = storeItem?.price;
-        if (!storeItem || !price || !price.product) {
-            console.warn("Invalid price or product information.");
-            return;
-        }
-
-        // Simulate creating payment info
-        const paymentInfo = Utils.createTestPaymentInfo(price);
-
-        const purchaseCompleted = (responseData: BalancyPurchaseProductResponseData) => {
-            console.log("Purchase of", responseData.productId, "success =", responseData.success);
-            if (!responseData.success) {
-                console.error("ErrorCode:", responseData.errorCode);
-                console.error("ErrorMessage:", responseData.errorMessage);
-            }
-            refresh(); // Refresh after purchase
-        };
-
-        if (price.type === SmartObjectsPriceType.Hard) {
-            Balancy.API.hardPurchaseStoreItem(storeItem, paymentInfo, purchaseCompleted, false);
-        } else {
-            console.error("Purchase type not supported:", price.type);
-        }
+    const tryToBuySlot = (storeItem: Nullable<SmartObjectsStoreItem>) => {
+        Balancy.API.initPurchase(storeItem, (success, errorMessage) => {
+            console.log("Purchase initialized:", success, errorMessage);
+            refresh();
+        });
     };
 
     useEffect(() => {
@@ -108,7 +87,7 @@ const ShopPage: React.FC = () => {
                             key={shopSlot.slot?.unnyId}
                             storeItem={storeItem}
                             canBuy={true} // Adjust logic if needed to determine availability
-                            onBuy={() => tryToBuySlot(shopSlot.slot?.storeItem)}
+                            onBuy={() => tryToBuySlot(shopSlot.slot?.storeItem ?? null)}
                             type={shopSlot.slot?.type}
                         />);
                     })}

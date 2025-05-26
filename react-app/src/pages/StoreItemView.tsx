@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Nullable, SmartObjectsStoreItem, SmartObjectsPriceType, LiveOpsStoreSlotType } from "@balancy/core";
 
 interface StoreItemViewProps {
@@ -9,10 +9,26 @@ interface StoreItemViewProps {
 }
 
 const StoreItemView: React.FC<StoreItemViewProps> = ({ storeItem, canBuy, onBuy, type }) => {
+    const [isClicked, setIsClicked] = useState(false);
+
     const handleBuy = () => {
-        if (storeItem) {
+        if (storeItem && canBuy) {
             onBuy(storeItem);
         }
+    };
+
+    const handleMouseDown = () => {
+        if (canBuy) {
+            setIsClicked(true);
+        }
+    };
+
+    const handleMouseUp = () => {
+        setIsClicked(false);
+    };
+
+    const handleMouseLeave = () => {
+        setIsClicked(false);
     };
 
     let priceStr = "N/A";
@@ -139,6 +155,9 @@ const StoreItemView: React.FC<StoreItemViewProps> = ({ storeItem, canBuy, onBuy,
             {/* Buy Button */}
             <button
                 onClick={handleBuy}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseLeave}
                 disabled={!canBuy}
                 style={{
                     padding: "8px 12px",
@@ -148,6 +167,8 @@ const StoreItemView: React.FC<StoreItemViewProps> = ({ storeItem, canBuy, onBuy,
                     borderRadius: "4px",
                     cursor: canBuy ? "pointer" : "not-allowed",
                     marginTop: "auto", // Pushes the button to the bottom
+                    transform: isClicked ? "scale(0.95)" : "scale(1)",
+                    transition: "transform 0.1s ease-in-out",
                 }}
             >
                 {priceStr}

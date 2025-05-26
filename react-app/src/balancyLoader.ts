@@ -1,5 +1,6 @@
 import { AppConfig, Balancy, Environment, BalancyPlatform } from '@balancy/core';
 import { FileHelperClassBrowser } from "./FileHelperClassBrowser";
+import {Utils} from "./Utils";
 
 export interface BalancyConfigParams {
     apiGameId: string;
@@ -32,6 +33,18 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
     config.engineVersion = 'React_1.0';
 
     Balancy.Callbacks.clearAll();
+
+    Balancy.Actions.Purchasing.setHardPurchaseCallback((productInfo) => {
+        console.log('Starting Purchase: ', productInfo?.productId);
+        const price = productInfo?.getStoreItem()?.price;
+        if (price) {
+            const paymentInfo = Utils.createTestPaymentInfo(price);
+            Balancy.API.finalizedHardPurchase(true, productInfo, paymentInfo);
+        } else
+            console.warn('No price information available for the product:', productInfo?.productId);
+        // Implement your hard purchase logic here
+    });
+
     // Create a promise that resolves when Balancy is fully initialized
     const initializationPromise = new Promise<void>((resolve, reject) => {
         Balancy.Callbacks.onDataUpdated.subscribe((status) => {
