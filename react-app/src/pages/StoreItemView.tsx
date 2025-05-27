@@ -32,28 +32,30 @@ const StoreItemView: React.FC<StoreItemViewProps> = ({ storeItem, canBuy, onBuy,
     };
 
     let priceStr = "N/A";
-    switch (storeItem?.price?.type) {
-        case SmartObjectsPriceType.Hard:
-            priceStr = storeItem?.price?.product ? `$ ${storeItem?.price?.product?.price.toFixed(2)}` : `N/A`;
-            break;
-        case SmartObjectsPriceType.Soft:
-            let price = storeItem?.price?.items;
-            if (price && price.length > 0) {
-                priceStr = '';
-                for (let i = 0; i < price.length; i++) {
-                    let p = price[i];
-                    if (p && p.item) {
-                        priceStr += `${p.item.name.value} x ${p.count} \n`;
-                        break;
+    if (storeItem) {
+        switch (storeItem.price?.type) {
+            case SmartObjectsPriceType.Hard:
+                priceStr = storeItem.price?.product ? `$ ${storeItem.price?.product?.price.toFixed(2)}` : `N/A`;
+                break;
+            case SmartObjectsPriceType.Soft:
+                let price = storeItem.price?.items;
+                if (price && price.length > 0) {
+                    priceStr = '';
+                    for (let i = 0; i < price.length; i++) {
+                        let p = price[i];
+                        if (p && p.item) {
+                            priceStr += `${p.item.name.value} x ${p.count} \n`;
+                            break;
+                        }
                     }
                 }
-            }
-            break;
-        case SmartObjectsPriceType.Ads:
-            priceStr = `▶️ ${storeItem?.price?.ads}`;
-            break;
-        default:
-            priceStr = "N/A";
+                break;
+            case SmartObjectsPriceType.Ads:
+                priceStr = `▶️ ${storeItem.getAdsWatched()} / ${storeItem.price?.ads}`;
+                break;
+            default:
+                priceStr = "N/A";
+        }
     }
 
     // Function to get the display text for the slot type

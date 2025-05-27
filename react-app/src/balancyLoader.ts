@@ -1,4 +1,4 @@
-import { AppConfig, Balancy, Environment, BalancyPlatform } from '@balancy/core';
+import {AppConfig, Balancy, Environment, BalancyPlatform, SmartObjectsStoreItem} from '@balancy/core';
 import { FileHelperClassBrowser } from "./FileHelperClassBrowser";
 import {Utils} from "./Utils";
 
@@ -33,6 +33,13 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
     config.engineVersion = 'React_1.0';
 
     Balancy.Callbacks.clearAll();
+
+    Balancy.Actions.Ads.setAdWatchCallback((storeItem : SmartObjectsStoreItem) => {
+        console.log('Fake ad watched for:', storeItem?.name);
+        // Implement your ad watch logic here
+        // For example, you can notify the API that the ad was watched
+        storeItem?.adWasWatched();
+    });
 
     Balancy.Actions.Purchasing.setHardPurchaseCallback((productInfo) => {
         console.log('Starting Purchase: ', productInfo?.productId);
