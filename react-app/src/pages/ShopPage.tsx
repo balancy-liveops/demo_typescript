@@ -7,7 +7,7 @@ import {
     SmartObjectsStoreItem,
     SmartObjectsPriceType, Nullable,
 } from "@balancy/core";
-import StoreItemView from "./StoreItemView"; // Reuse from previous implementation
+import StoreItemViewAdvanced from "./StoreItemViewAdvanced"; // Reuse from previous implementation
 
 const ShopPage: React.FC = () => {
     const [shopPages, setShopPages] = useState<SmartObjectsShopPage[]>([]);
@@ -36,8 +36,8 @@ const ShopPage: React.FC = () => {
         setActivePage(page);
     };
 
-    const tryToBuySlot = (storeItem: Nullable<SmartObjectsStoreItem>) => {
-        Balancy.API.initPurchase(storeItem, (success, errorMessage) => {
+    const tryToBuySlot = (shopSlot: Nullable<SmartObjectsShopSlot>) => {
+        Balancy.API.initPurchaseShop(shopSlot, (success, errorMessage) => {
             console.log("Purchase initialized:", success, errorMessage);
             refresh();
         });
@@ -80,17 +80,17 @@ const ShopPage: React.FC = () => {
             {/* Grid of Slots */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: "20px" }}>
                 {activePage?.activeSlots?.toArray().map((shopSlot: SmartObjectsShopSlot) => {
-                    const storeItem = shopSlot.slot?.storeItem;
-                    if (!storeItem)
+                    const localShopSlot = shopSlot;
+                    if (!localShopSlot?.slot)
                         return  null;
-                        return (<StoreItemView
-                            key={shopSlot.slot?.unnyId}
-                            storeItem={storeItem}
-                            canBuy={true} // Adjust logic if needed to determine availability
-                            onBuy={() => tryToBuySlot(shopSlot.slot?.storeItem ?? null)}
-                            type={shopSlot.slot?.type}
-                        />);
-                    })}
+
+                    return (<StoreItemViewAdvanced
+                        key={shopSlot.slot?.unnyId}
+                        storeSlot={localShopSlot.slot}
+                        canBuy={true} // Adjust logic if needed to determine availability
+                        onBuy={() => tryToBuySlot(localShopSlot)}
+                    />);
+                })}
             </div>
         </div>
     );

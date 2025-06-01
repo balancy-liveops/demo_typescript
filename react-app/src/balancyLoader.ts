@@ -36,8 +36,7 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
 
     Balancy.Actions.Ads.setAdWatchCallback((storeItem : SmartObjectsStoreItem) => {
         console.log('Fake ad watched for:', storeItem?.name);
-        // Implement your ad watch logic here
-        // For example, you can notify the API that the ad was watched
+        //TODO Implement your ad watch logic here
         storeItem?.adWasWatched();
     });
 
