@@ -146,14 +146,18 @@ const DailyBonusPage: React.FC = () => {
                     {/* Bonus Reward */}
                     {selectedBonus.dailyBonus?.bonusReward?.items.length ? (
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                            <p style={{ fontSize: "1.125rem" }}>
-                                Bonus Reward:{" "}
-                                <strong>
-                                    {selectedBonus.dailyBonus.bonusReward.items[0]?.item?.name.value ?? "Unknown"}
-                                    {" x"}
-                                    {selectedBonus.dailyBonus.bonusReward.items[0]?.count ?? 0}
-                                </strong>
-                            </p>
+                            <div style={{ fontSize: "1.125rem" }}>
+                                <p style={{ margin: "0 0 4px 0" }}>Bonus Reward:</p>
+                                {selectedBonus.dailyBonus.bonusReward.items.map((item, itemIndex) => (
+                                    <p key={itemIndex} style={{ margin: "2px 0" }}>
+                                        <strong>
+                                            {item?.item?.name.value ?? "Unknown"}
+                                            {" x"}
+                                            {item?.count ?? 0}
+                                        </strong>
+                                    </p>
+                                ))}
+                            </div>
                             {isNextRewardBonus && <button
                                 style={{
                                     padding: "4px 12px",
@@ -188,11 +192,12 @@ const DailyBonusPage: React.FC = () => {
                         const canClaim = rewardNumber === selectedBonus.getNextRewardNumber() && selectedBonus.canClaimNextReward();
                         const btnColor = isClaimed ? "#828181" : canClaim ? "#ecc94b" : "#e78484";
 
-                        const firstItem = reward?.items && reward.items.length > 0 ? reward.items[0] : null;
                         return (
                             <div
                                 key={index}
                                 style={{
+                                    display: "flex",
+                                    flexDirection: "column",
                                     padding: "16px",
                                     borderRadius: "8px",
                                     boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
@@ -202,12 +207,20 @@ const DailyBonusPage: React.FC = () => {
                                 <p style={{ fontSize: "0.875rem", fontWeight: "bold", marginBottom: "8px" }}>
                                     Day {rewardNumber}
                                 </p>
-                                <p style={{ fontSize: "0.875rem" }}>
-                                    {firstItem?.item?.name.value} x{firstItem?.count}
-                                </p>
+                                <div style={{ marginBottom: "8px" }}>
+                                    {reward?.items && reward.items.length > 0 ? (
+                                        reward.items.map((item, itemIndex) => (
+                                            <p key={itemIndex} style={{ fontSize: "0.875rem", margin: "2px 0" }}>
+                                                {item?.item?.name.value} x{item?.count}
+                                            </p>
+                                        ))
+                                    ) : (
+                                        <p style={{ fontSize: "0.875rem" }}>No items</p>
+                                    )}
+                                </div>
                                 <button
                                     style={{
-                                        marginTop: "8px",
+                                        marginTop: "auto",
                                         padding: "4px 12px",
                                         backgroundColor: btnColor,
                                         color: "black",
