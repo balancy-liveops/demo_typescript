@@ -1,4 +1,11 @@
-import {AppConfig, Balancy, Environment, BalancyPlatform, SmartObjectsStoreItem} from '@balancy/core';
+import {
+    AppConfig,
+    Balancy,
+    Environment,
+    BalancyPlatform,
+    SmartObjectsStoreItem,
+    SmartObjectsGameEvent
+} from '@balancy/core';
 import { FileHelperClassBrowser } from "./FileHelperClassBrowser";
 import {Utils} from "./Utils";
 

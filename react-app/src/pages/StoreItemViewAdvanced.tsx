@@ -4,19 +4,19 @@ import {
     SmartObjectsStoreItem,
     SmartObjectsPriceType,
     LiveOpsStoreSlotType,
-    LiveOpsStoreSlot
+    SmartObjectsShopSlot
 } from "@balancy/core";
 
 // Assuming you have a Slot type - adjust according to your actual Balancy types
 
 interface StoreItemViewAdvancedProps {
-    storeSlot: LiveOpsStoreSlot;
+    shopSlot: SmartObjectsShopSlot;
     canBuy: boolean;
     onBuy: (storeItem: Nullable<SmartObjectsStoreItem>) => void;
 }
 
 const StoreItemViewAdvanced: React.FC<StoreItemViewAdvancedProps> = ({
-    storeSlot,
+    shopSlot,
     canBuy: originalCanBuy,
     onBuy
 }) => {
@@ -26,11 +26,12 @@ const StoreItemViewAdvanced: React.FC<StoreItemViewAdvancedProps> = ({
     const [isAvailable, setIsAvailable] = useState(true);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-    const storeItem = storeSlot.storeItem;
+    const storeSlot = shopSlot.slot;
+    const storeItem = storeSlot?.storeItem;
 
     useEffect(() => {
         // Initialize availability state
-        const available = storeSlot.isAvailable();
+        const available = shopSlot.isAvailable();
         setIsAvailable(available);
 
 
@@ -50,7 +51,7 @@ const StoreItemViewAdvanced: React.FC<StoreItemViewAdvancedProps> = ({
         return () => {
             clearTimer();
         };
-    }, [storeSlot, originalCanBuy]);
+    }, [shopSlot, storeSlot, originalCanBuy]);
 
     const clearTimer = () => {
         if (timerRef.current) {
@@ -60,14 +61,14 @@ const StoreItemViewAdvanced: React.FC<StoreItemViewAdvancedProps> = ({
     };
 
     const updateTimers = () => {
-        if (storeSlot.isAvailable()) {
+        if (shopSlot.isAvailable()) {
             clearTimer();
             setIsAvailable(true);
             setCurrentCanBuy(originalCanBuy);
             return;
         }
 
-        const seconds = storeSlot.getSecondsLeftUntilAvailable();
+        const seconds = shopSlot.getSecondsLeftUntilAvailable();
         setSecondsLeft(seconds);
         setIsAvailable(false);
         setCurrentCanBuy(false);
@@ -160,6 +161,9 @@ const StoreItemViewAdvanced: React.FC<StoreItemViewAdvancedProps> = ({
                 return "";
         }
     };
+
+    if (!storeSlot)
+        return null;
 
     return (
         <div
@@ -254,7 +258,7 @@ const StoreItemViewAdvanced: React.FC<StoreItemViewAdvancedProps> = ({
             )}
 
             {/* Limits Display - shown when slot has purchase limits */}
-            {storeSlot.hasLimits() && (
+            {shopSlot.hasLimits() && (
                 <div
                     style={{
                         backgroundColor: "#f8f9fa",
@@ -266,7 +270,7 @@ const StoreItemViewAdvanced: React.FC<StoreItemViewAdvancedProps> = ({
                         border: "1px solid #dee2e6",
                     }}
                 >
-                    Purchased {storeSlot.getPurchasesDoneDuringTheLastCycle()}/{storeSlot.getPurchasesLimitForCycle()}
+                    Purchased {shopSlot.getPurchasesDoneDuringTheLastCycle()}/{shopSlot.getPurchasesLimitForCycle()}
                 </div>
             )}
 

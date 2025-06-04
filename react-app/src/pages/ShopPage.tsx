@@ -86,7 +86,7 @@ const ShopPage: React.FC = () => {
 
                     return (<StoreItemViewAdvanced
                         key={shopSlot.slot?.unnyId}
-                        storeSlot={localShopSlot.slot}
+                        shopSlot={localShopSlot}
                         canBuy={true} // Adjust logic if needed to determine availability
                         onBuy={() => tryToBuySlot(localShopSlot)}
                     />);
