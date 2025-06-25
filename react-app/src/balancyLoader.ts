@@ -4,10 +4,13 @@ import {
     Environment,
     BalancyPlatform,
     SmartObjectsStoreItem,
-    SmartObjectsGameEvent
+    SmartObjectsGameEvent,
+    FileHelperManager
 } from '@balancy/core';
-import { FileHelperClassBrowser } from "./FileHelperClassBrowser";
+// import { FileHelperClassBrowser } from "./FileHelperClassBrowser";
+import {IndexedDBFileHelper} from "./IndexedDBFileHelper";
 import {Utils} from "./Utils";
+import {IndexedDBFileHelperAdapter} from "./IndexedDBFileHelperAdapter";
 
 export interface BalancyConfigParams {
     apiGameId: string;
@@ -80,9 +83,20 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
         });
     });
 
-    await Balancy.Main.initializeFileHelper(new FileHelperClassBrowser({
+    // Create and initialize the IndexedDB adapter in one line
+    const fileHelperAdapter = await IndexedDBFileHelperAdapter.create({
         cachePath: '.balancy'
-    }));
+    });
+
+    const stats = fileHelperAdapter.getCacheStats();
+    console.log(`📁 Files: ${stats.fileCount}, 💾 Memory: ${stats.memoryUsage}`);
+
+    // 🔑 РЕГИСТРИРУЕМ FileHelper в глобальном менеджере для доступа из UnnyObject
+    // FileHelperManager.setInstance(fileHelperAdapter);
+    // console.log('📁 FileHelperManager registered successfully');
+
+    // Initialize Balancy with the ready adapter
+    await Balancy.Main.initializeFileHelper(fileHelperAdapter);
 
     await Balancy.Main.init(config);
     console.log('Balancy Initialized, waiting for data synchronization...');

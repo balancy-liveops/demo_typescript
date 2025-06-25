@@ -6,6 +6,7 @@ import {
     LiveOpsStoreSlotType,
     SmartObjectsShopSlot
 } from "@balancy/core";
+import { useCachedSprite } from "../hooks/useCachedSprite";
 
 // Assuming you have a Slot type - adjust according to your actual Balancy types
 
@@ -24,10 +25,14 @@ const StoreItemViewAdvanced: React.FC<StoreItemViewAdvancedProps> = ({
     const [currentCanBuy, setCurrentCanBuy] = useState(originalCanBuy);
     const [secondsLeft, setSecondsLeft] = useState(0);
     const [isAvailable, setIsAvailable] = useState(true);
+    
     const timerRef = useRef<NodeJS.Timeout | null>(null);
 
     const storeSlot = shopSlot.slot;
     const storeItem = storeSlot?.storeItem;
+    
+    // Используем хук для кеширования спрайтов
+    const { spriteUrl, isLoading: isSpriteLoading, error: spriteError } = useCachedSprite(storeItem?.sprite);
 
     useEffect(() => {
         // Initialize availability state
@@ -212,19 +217,60 @@ const StoreItemViewAdvanced: React.FC<StoreItemViewAdvancedProps> = ({
             </p>
 
             {/* Sprite */}
-            <img
-                src={storeItem?.sprite?.getFullUrl() || ""}
-                alt="Sprite"
-                style={{
-                    minWidth: "80px",
-                    minHeight: "80px",
-                    width: "80px",
-                    height: "80px",
-                    objectFit: "contain",
-                    margin: "10px auto",
-                    display: "block",
-                }}
-            />
+            <div style={{ position: 'relative' }}>
+                {isSpriteLoading && (
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            fontSize: '12px',
+                            color: '#666',
+                            zIndex: 1
+                        }}
+                    >
+                        Загрузка...
+                    </div>
+                )}
+                
+                {/* Показываем ошибку кеширования если есть */}
+                {spriteError && (
+                    <div
+                        style={{
+                            position: 'absolute',
+                            bottom: '0',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            fontSize: '10px',
+                            color: '#ff6b6b',
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            padding: '2px 4px',
+                            borderRadius: '2px',
+                            zIndex: 1
+                        }}
+                        title={spriteError}
+                    >
+                        ⚠️
+                    </div>
+                )}
+                
+                <img
+                    src={spriteUrl || ""}
+                    alt="Sprite"
+                    style={{
+                        minWidth: "80px",
+                        minHeight: "80px",
+                        width: "80px",
+                        height: "80px",
+                        objectFit: "contain",
+                        margin: "10px auto",
+                        display: "block",
+                        opacity: isSpriteLoading ? 0.5 : 1,
+                        transition: 'opacity 0.3s ease'
+                    }}
+                />
+            </div>
 
             {/* Reward Items List */}
             {storeItem?.reward?.items && storeItem.reward.items.length > 0 && (
