@@ -71,20 +71,3 @@ export const useCachedSprite = (
     };
 };
 
-/**
- * Хук для управления кешем спрайтов
- */
-export const useSpriteCache = () => {
-    const clearCache = useCallback(() => {
-        UnnyObject.clearSpriteCache();
-    }, []);
-
-    const preloadSprites = useCallback((sprites: UnnyObject[]) => {
-        UnnyObject.preloadSprites(sprites);
-    }, []);
-
-    return {
-        clearCache,
-        preloadSprites
-    };
-};
