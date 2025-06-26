@@ -29,35 +29,35 @@ export interface JSFileHelper {
   saveFileInCacheBinaryCallback: (fileName: string, data: ArrayBuffer | Uint8Array) => Promise<void>;
   saveFileInResourcesCallback: (fileName: string, data: string) => Promise<void>;
   saveFileInResourcesBinaryCallback: (fileName: string, data: ArrayBuffer | Uint8Array) => Promise<void>;
-  
+
   // Очистка папок
   cleanUpResourcesFolderCallback: () => Promise<void>;
   cleanGeneratedCodeFolderCallback: () => Promise<void>;
-  
+
   // Работа с сгенерированным кодом
   saveGeneratedCodeCallback: (fileName: string, data: string) => Promise<void>;
-  
+
   // Загрузка файлов
   loadFileFromCacheCallback: (fileName: string) => Promise<string>;
   loadFileFromResourcesCallback: (fileName: string) => Promise<string>;
   loadFileFromResourcesAsBase64Callback: (fileName: string) => Promise<string>;
-  
+
   // Удаление
   deleteCachedFolderCallback: (path: string) => Promise<void>;
   deleteCachedFileCallback: (path: string) => Promise<void>;
-  
+
   // Проверка существования
   fileExistsInCacheCallback: (fileName: string) => Promise<boolean>;
   fileExistsInResourcesCallback: (fileName: string) => Promise<boolean>;
-  
+
   // Получение путей
-  getCachePathCallback: (fileName: string) => Promise<string>;
-  getResourcesPathCallback: (fileName: string) => Promise<string>;
-  
+  getCachePathCallback: (fileName: string) => string;
+  getResourcesPathCallback: (fileName: string) => string;
+
   // Списки файлов и папок
   getFilesInCachedFolderCallback: (path: string) => Promise<string[]>;
   getFoldersInCachedFolderCallback: (path: string) => Promise<string[]>;
-  
+
   // Временные папки
   activateTempFolderCallback: () => void;
   deactivateTempFolderCallback: () => void;
@@ -72,7 +72,7 @@ export class IndexedDBFileHelper implements JSFileHelper {
   private db: IDBDatabase | null = null;
   private isInitialized = false;
   private isTempActive = false;
-  
+
   private readonly DB_NAME = 'BalancyFileStorage';
   private readonly DB_VERSION = 1;
   private readonly STORES = {
@@ -96,23 +96,23 @@ export class IndexedDBFileHelper implements JSFileHelper {
   private async initIndexedDB(): Promise<void> {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
-      
+
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
         this.db = request.result;
         resolve();
       };
-      
+
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
-        
+
         // Хранилище файлов
         if (!db.objectStoreNames.contains(this.STORES.FILES)) {
           const filesStore = db.createObjectStore(this.STORES.FILES, { keyPath: 'fileName' });
           filesStore.createIndex('directory', 'directory', { unique: false });
           filesStore.createIndex('fileType', 'fileType', { unique: false });
         }
-        
+
         // Хранилище директорий
         if (!db.objectStoreNames.contains(this.STORES.DIRECTORIES)) {
           const dirsStore = db.createObjectStore(this.STORES.DIRECTORIES, { keyPath: 'path' });
@@ -142,11 +142,11 @@ export class IndexedDBFileHelper implements JSFileHelper {
 
   private async saveFile(directory: string, fileName: string, data: string | ArrayBuffer | Uint8Array): Promise<void> {
     await this.ensureInitialized();
-    
+
     const actualDirectory = this.isTempActive ? this.getTempPath(directory) : directory;
     const fullPath = this.getFullPath(actualDirectory, fileName);
     const { data: normalizedData, fileType } = this.normalizeData(data);
-    
+
     const fileRecord: FileRecord = {
       fileName: fullPath,
       directory: actualDirectory,
@@ -166,13 +166,13 @@ export class IndexedDBFileHelper implements JSFileHelper {
 
   public async loadFile(directory: string, fileName: string): Promise<string | ArrayBuffer | null> {
     await this.ensureInitialized();
-    
+
     const fullPath = this.getFullPath(directory, fileName);
-    
+
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([this.STORES.FILES], 'readonly');
       const request = transaction.objectStore(this.STORES.FILES).get(fullPath);
-      
+
       request.onsuccess = () => {
         const result = request.result as FileRecord;
         resolve(result ? result.data : null);
@@ -183,13 +183,13 @@ export class IndexedDBFileHelper implements JSFileHelper {
 
   private async fileExists(directory: string, fileName: string): Promise<boolean> {
     await this.ensureInitialized();
-    
+
     const fullPath = this.getFullPath(directory, fileName);
-    
+
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([this.STORES.FILES], 'readonly');
       const request = transaction.objectStore(this.STORES.FILES).get(fullPath);
-      
+
       request.onsuccess = () => resolve(!!request.result);
       request.onerror = () => reject(request.error);
     });
@@ -197,9 +197,9 @@ export class IndexedDBFileHelper implements JSFileHelper {
 
   private async deleteFile(directory: string, fileName: string): Promise<void> {
     await this.ensureInitialized();
-    
+
     const fullPath = this.getFullPath(directory, fileName);
-    
+
     const transaction = this.db!.transaction([this.STORES.FILES], 'readwrite');
     await new Promise<void>((resolve, reject) => {
       const request = transaction.objectStore(this.STORES.FILES).delete(fullPath);
@@ -210,14 +210,14 @@ export class IndexedDBFileHelper implements JSFileHelper {
 
   private async clearDirectory(directory: string): Promise<void> {
     await this.ensureInitialized();
-    
+
     const transaction = this.db!.transaction([this.STORES.FILES], 'readwrite');
     const store = transaction.objectStore(this.STORES.FILES);
     const index = store.index('directory');
-    
+
     await new Promise<void>((resolve, reject) => {
       const request = index.openCursor(IDBKeyRange.only(directory));
-      
+
       request.onsuccess = (event) => {
         const cursor = (event.target as IDBRequest).result;
         if (cursor) {
@@ -227,22 +227,22 @@ export class IndexedDBFileHelper implements JSFileHelper {
           resolve();
         }
       };
-      
+
       request.onerror = () => reject(request.error);
     });
   }
 
   private async getFilesInDirectory(directory: string): Promise<string[]> {
     await this.ensureInitialized();
-    
+
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([this.STORES.FILES], 'readonly');
       const store = transaction.objectStore(this.STORES.FILES);
       const index = store.index('directory');
       const files: string[] = [];
-      
+
       const request = index.openCursor(IDBKeyRange.only(directory));
-      
+
       request.onsuccess = (event) => {
         const cursor = (event.target as IDBRequest).result;
         if (cursor) {
@@ -258,7 +258,7 @@ export class IndexedDBFileHelper implements JSFileHelper {
           resolve(files);
         }
       };
-      
+
       request.onerror = () => reject(request.error);
     });
   }
@@ -276,10 +276,10 @@ export class IndexedDBFileHelper implements JSFileHelper {
 
   async createSubDirectoryInCacheCallback(fileName: string): Promise<void> {
     await this.ensureInitialized();
-    
+
     const actualDirectory = this.isTempActive ? this.getTempPath(this.cacheDir) : this.cacheDir;
     const dirPath = this.getFullPath(actualDirectory, fileName);
-    
+
     const dirRecord: DirectoryRecord = {
       path: dirPath,
       parentPath: actualDirectory,
@@ -342,13 +342,13 @@ export class IndexedDBFileHelper implements JSFileHelper {
   async loadFileFromResourcesAsBase64Callback(fileName: string): Promise<string> {
     if (!this.resourcesDir) return '';
     const data = await this.loadFile(this.resourcesDir, fileName);
-    
+
     if (typeof data === 'string') {
       return btoa(data);
     } else if (data instanceof ArrayBuffer) {
       return this.arrayBufferToBase64(data);
     }
-    
+
     return '';
   }
 
@@ -370,11 +370,12 @@ export class IndexedDBFileHelper implements JSFileHelper {
     return await this.fileExists(this.resourcesDir, fileName);
   }
 
-  async getCachePathCallback(fileName: string): Promise<string> {
+  getCachePathCallback(fileName: string): string {
+    console.log("----- " + this.getFullPath(this.cacheDir, fileName));
     return this.getFullPath(this.cacheDir, fileName);
   }
 
-  async getResourcesPathCallback(fileName: string): Promise<string> {
+  getResourcesPathCallback(fileName: string): string {
     if (!this.resourcesDir) return '';
     return this.getFullPath(this.resourcesDir, fileName);
   }
@@ -386,17 +387,17 @@ export class IndexedDBFileHelper implements JSFileHelper {
 
   async getFoldersInCachedFolderCallback(path: string): Promise<string[]> {
     await this.ensureInitialized();
-    
+
     const folderPath = path === '' ? this.cacheDir : this.getFullPath(this.cacheDir, path);
-    
+
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([this.STORES.DIRECTORIES], 'readonly');
       const store = transaction.objectStore(this.STORES.DIRECTORIES);
       const index = store.index('parentPath');
       const folders: string[] = [];
-      
+
       const request = index.openCursor(IDBKeyRange.only(folderPath));
-      
+
       request.onsuccess = (event) => {
         const cursor = (event.target as IDBRequest).result;
         if (cursor) {
@@ -407,7 +408,7 @@ export class IndexedDBFileHelper implements JSFileHelper {
           resolve(folders);
         }
       };
-      
+
       request.onerror = () => reject(request.error);
     });
   }
@@ -437,15 +438,15 @@ export class IndexedDBFileHelper implements JSFileHelper {
   async applyTempFolderCallback(tempFolder: string): Promise<void> {
     const tempPath = this.getTempPath(this.cacheDir);
     const tempFolderPath = this.getFullPath(tempPath, tempFolder);
-    
+
     // Получаем все файлы из временной папки
     const tempFiles = await this.getFilesInDirectory(tempFolderPath);
-    
+
     // Перемещаем файлы из временной папки в основную
     for (const fileName of tempFiles) {
       const tempFilePath = this.getFullPath(tempFolderPath, fileName);
       const cacheFilePath = this.getFullPath(this.cacheDir, fileName);
-      
+
       // Загружаем файл из временной папки
       const data = await this.loadFile(tempFolderPath, fileName);
       if (data) {
@@ -466,12 +467,12 @@ export class IndexedDBFileHelper implements JSFileHelper {
           request.onsuccess = () => resolve();
           request.onerror = () => reject(request.error);
         });
-        
+
         // Удаляем из временной папки
         await this.deleteFile(tempFolderPath, fileName);
       }
     }
-    
+
     // Очищаем временную папку
     await this.clearDirectory(tempFolderPath);
     this.isTempActive = false;
@@ -485,7 +486,7 @@ export class IndexedDBFileHelper implements JSFileHelper {
   async createObjectUrl(directory: string, fileName: string): Promise<string | null> {
     const data = await this.loadFile(directory, fileName);
     if (!data || typeof data === 'string') return null;
-    
+
     const blob = new Blob([data]);
     return URL.createObjectURL(blob);
   }

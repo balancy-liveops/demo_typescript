@@ -91,10 +91,6 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
     const stats = fileHelperAdapter.getCacheStats();
     console.log(`📁 Files: ${stats.fileCount}, 💾 Memory: ${stats.memoryUsage}`);
 
-    // 🔑 РЕГИСТРИРУЕМ FileHelper в глобальном менеджере для доступа из UnnyObject
-    // FileHelperManager.setInstance(fileHelperAdapter);
-    // console.log('📁 FileHelperManager registered successfully');
-
     // Initialize Balancy with the ready adapter
     await Balancy.Main.initializeFileHelper(fileHelperAdapter);
 

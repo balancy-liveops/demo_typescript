@@ -106,7 +106,7 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
 
   public fileExistsInCacheCallback(path: string): boolean {
     console.log("fileExistsInCacheCallback " + path);
-    const cacheKey = `cache/${path}`;
+    const cacheKey = `${path}`;
     if (this.existsCache.has(cacheKey)) {
       console.log("cache hit for existsCache: " + cacheKey + " => " + this.existsCache.get(cacheKey));
       return this.existsCache.get(cacheKey)!;
@@ -123,8 +123,28 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
       });
     }
 
-    console.warn(`File ${path} not found in cache, returning false`);
+    console.warn(`File ${path} not found in cache, returning false: this.isReady = ${this.isReady}`);
     return false;
+  }
+
+  public getCachePathCallback(path: string): string {
+    if (!this.isReady) {
+      console.warn('IndexedDB not ready yet, returning empty path');
+      return '';
+    }
+
+    // Возвращаем путь к кэшу
+    return this.indexedDBHelper.getCachePathCallback(path);
+  }
+
+  public getResourcesPathCallback(path: string): string {
+    if (!this.isReady) {
+      console.warn('IndexedDB not ready yet, returning empty path');
+      return '';
+    }
+
+    // Возвращаем путь к ресурсам
+    return this.indexedDBHelper.getResourcesPathCallback(path);
   }
 
   public fileExistsInResourcesCallback(path: string): boolean {
@@ -140,18 +160,16 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
       return;
     }
 
-    // Кэшируем для синхронного чтения
-    const cacheKey = `cache/${fileName}`;
-    this.fileCache.set(cacheKey, data);
-    this.existsCache.set(cacheKey, true);
+    this.fileCache.set(fileName, data);
+    this.existsCache.set(fileName, true);
 
-    //console.log("saveFileInCacheCallback... " + fileName + " data: " + data.length + " bytes == " + data);
+    // console.log("saveFileInCacheCallback... " + fileName + " data: " + data.length + " bytes == " + data);
     // Асинхронно сохраняем в IndexedDB
     this.indexedDBHelper.saveFileInCacheCallback(fileName, data).catch(error => {
       console.error('Error saving file to cache:', error);
       // Удаляем из кэша при ошибке
-      this.fileCache.delete(cacheKey);
-      this.existsCache.set(cacheKey, false);
+      this.fileCache.delete(fileName);
+      this.existsCache.set(fileName, false);
     });
   }
 
@@ -172,18 +190,19 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
     const dataCopy = new Uint8Array(memoryView);
     const arrayBuffer = dataCopy.buffer.slice(dataCopy.byteOffset, dataCopy.byteOffset + dataCopy.byteLength);
 
-    // Кэшируем для синхронного чтения
-    const cacheKey = `cache/${fileName}`;
-
     // Сохраняем как Uint8Array в память для быстрого доступа
-    this.fileCache.set(cacheKey, dataCopy);
-    this.existsCache.set(cacheKey, true);
+    this.fileCache.set(fileName, dataCopy);
+    this.existsCache.set(fileName, true);
+
+    console.log('=>DONE saveFileInCacheBinaryCallback... ' + fileName + ' data: ' + memoryView.length + ' bytes');
 
     // Асинхронно сохраняем в IndexedDB
-    this.indexedDBHelper.saveFileInCacheBinaryCallback(fileName, arrayBuffer).catch(error => {
+    this.indexedDBHelper.saveFileInCacheBinaryCallback(fileName, arrayBuffer).then(()=>{
+      console.log('ALL Saved!!');
+    }).catch(error => {
       console.error('Error saving binary file to cache:', error);
-      this.fileCache.delete(cacheKey);
-      this.existsCache.set(cacheKey, false);
+      this.fileCache.delete(fileName);
+      this.existsCache.set(fileName, false);
     });
   }
 
@@ -258,17 +277,15 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
   }
 
   loadFileFromCacheCallback(fileName: string): string {
-    const cacheKey = `cache/${fileName}`;
-
     // Сначала проверяем кэш
-    if (this.fileCache.has(cacheKey)) {
-      const cachedData = this.fileCache.get(cacheKey)!;
-      
+    if (this.fileCache.has(fileName)) {
+      const cachedData = this.fileCache.get(fileName)!;
+
       // Если это бинарные данные (Uint8Array), конвертируем в строку
       if (cachedData instanceof Uint8Array) {
         return new TextDecoder().decode(cachedData);
       }
-      
+
       // Если это строка, возвращаем как есть
       return cachedData;
     }
@@ -278,12 +295,12 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
       // Запускаем асинхронную загрузку для будущих вызовов
       this.indexedDBHelper.loadFileFromCacheCallback(fileName).then(data => {
         if (data) {
-          this.fileCache.set(cacheKey, data);
-          this.existsCache.set(cacheKey, true);
+          this.fileCache.set(fileName, data);
+          this.existsCache.set(fileName, true);
         }
       }).catch(error => {
         console.error('Error loading file from cache:', error);
-        this.existsCache.set(cacheKey, false);
+        this.existsCache.set(fileName, false);
       });
     }
 
@@ -296,12 +313,12 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
 
     if (this.fileCache.has(cacheKey)) {
       const cachedData = this.fileCache.get(cacheKey)!;
-      
+
       // Если это бинарные данные (Uint8Array), конвертируем в строку
       if (cachedData instanceof Uint8Array) {
         return new TextDecoder().decode(cachedData);
       }
-      
+
       // Если это строка, возвращаем как есть
       return cachedData;
     }
@@ -332,9 +349,8 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
     }
 
     // Очищаем кэш для этой папки
-    const folderPrefix = `cache/${path}`;
     for (const [key] of this.fileCache) {
-      if (key.startsWith(folderPrefix)) {
+      if (key.startsWith(path)) {
         this.fileCache.delete(key);
         this.existsCache.set(key, false);
       }
@@ -354,9 +370,8 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
       return;
     }
 
-    const cacheKey = `cache/${path}`;
-    this.fileCache.delete(cacheKey);
-    this.existsCache.set(cacheKey, false);
+    this.fileCache.delete(path);
+    this.existsCache.set(path, false);
 
     this.indexedDBHelper.deleteCachedFileCallback(path).catch(error => {
       console.error('Error deleting cached file:', error);
@@ -370,12 +385,11 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
     }
 
     // Пытаемся получить из кэша
-    const folderPrefix = `cache/${path}`;
     const cachedFiles: string[] = [];
 
     for (const [key] of this.fileCache) {
-      if (key.startsWith(folderPrefix)) {
-        const fileName = key.substring(folderPrefix.length + 1);
+      if (key.startsWith(path)) {
+        const fileName = key.substring(path.length + 1);
         cachedFiles.push(fileName);
       }
     }
@@ -384,7 +398,7 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
     this.indexedDBHelper.getFilesInCachedFolderCallback(path).then(files => {
       // Обновляем информацию о существующих файлах
       files.forEach(fileName => {
-        const cacheKey = `cache/${path}/${fileName}`;
+        const cacheKey = `${path}/${fileName}`;
         this.existsCache.set(cacheKey, true);
       });
     }).catch(error => {
@@ -414,29 +428,28 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
   * Предзагружает файлы в кэш для быстрого синхронного доступа
   */
   async preloadCache(): Promise<void> {
-  await this.waitForReady();
+    await this.waitForReady();
 
-  try {
-  // Загружаем список всех файлов и предзагружаем их в память
-  const cacheFiles = await this.indexedDBHelper.getFilesInCachedFolderCallback('');
+    try {
+      // Загружаем список всех файлов и предзагружаем их в память
+      const cacheFiles = await this.indexedDBHelper.getFilesInCachedFolderCallback('');
 
-  for (const fileName of cacheFiles) {
-  try {
-  const data = await this.indexedDBHelper.loadFileFromCacheCallback(fileName);
-  if (data) {
-  const cacheKey = `cache/${fileName}`;
-  this.fileCache.set(cacheKey, data);
-  this.existsCache.set(cacheKey, true);
-  }
-  } catch (error) {
-  console.error(`Error preloading file ${fileName}:`, error);
-  }
-  }
+      for (const fileName of cacheFiles) {
+        try {
+          const data = await this.indexedDBHelper.loadFileFromCacheCallback(fileName);
+          if (data) {
+            this.fileCache.set(fileName, data);
+            this.existsCache.set(fileName, true);
+          }
+        } catch (error) {
+          console.error(`Error preloading file ${fileName}:`, error);
+        }
+      }
 
-  console.log(`Preloaded ${cacheFiles.length} files into memory cache`);
-  } catch (error) {
-  console.error('Error during cache preload:', error);
-  }
+      console.log(`Preloaded ${cacheFiles.length} files into memory cache`);
+    } catch (error) {
+      console.error('Error during cache preload:', error);
+    }
   }
 
   /**
@@ -465,32 +478,36 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
           let cacheKey = '';
 
           // Определяем как загружать файл в зависимости от директории
-          if (fileInfo.directory.includes('cache') || fileInfo.directory === '.balancy') {
-            data = await this.indexedDBHelper.loadFileFromCacheCallback(fileInfo.fileName);
-            cacheKey = `cache/${fileInfo.fileName}`;
-          } else if (fileInfo.directory.includes('resources')) {
-            data = await this.indexedDBHelper.loadFileFromResourcesCallback(fileInfo.fileName);
-            cacheKey = `resources/${fileInfo.fileName}`;
-          } else {
-            // Используем общий метод loadFile
+          // if (fileInfo.directory.includes('cache') || fileInfo.directory === '.balancy') {
+          //   data = await this.indexedDBHelper.loadFileFromCacheCallback(fileInfo.fileName);
+          //   console.log("*** " + fileInfo.fileName + " :: " + data.length + " == " + data);
+          //   cacheKey = `${fileInfo.fileName}`;
+          // } else if (fileInfo.directory.includes('resources')) {
+          //   data = await this.indexedDBHelper.loadFileFromResourcesCallback(fileInfo.fileName);
+          //   cacheKey = `resources/${fileInfo.fileName}`;
+          // } else {
+            // Используем общий метод loadFile для всех остальных директорий
             data = await this.indexedDBHelper.loadFile(fileInfo.directory, fileInfo.fileName);
-            cacheKey = `${fileInfo.directory}/${fileInfo.fileName}`;
-          }
+            cacheKey = fileInfo.fileName;
+          // }
 
           if (data) {
-            // Если это бинарные данные, конвертируем в base64
+            // Для ВСЕХ файлов (включая бинарные) сохраняем как есть
             if (data instanceof ArrayBuffer) {
-              const base64 = this.arrayBufferToBase64(data);
-              this.fileCache.set(cacheKey, base64);
-              totalSize += base64.length;
+              // Сохраняем бинарные данные как Uint8Array для прямого доступа
+              const uint8Array = new Uint8Array(data);
+              this.fileCache.set(cacheKey, uint8Array);
+              totalSize += uint8Array.byteLength;
+              console.log(`✅ Loaded BINARY: ${cacheKey} (${uint8Array.byteLength} bytes)`);
             } else {
+              // Текстовые файлы сохраняем как строки
               this.fileCache.set(cacheKey, data);
               totalSize += data.length;
+              console.log(`✅ Loaded TEXT: ${cacheKey} (${data.length} chars)`);
             }
 
             this.existsCache.set(cacheKey, true);
             totalFiles++;
-            console.log(`✅ Loaded: ${cacheKey}`);
           }
         } catch (error) {
           console.error(`❌ Error preloading file ${fileInfo.directory}/${fileInfo.fileName}:`, error);
@@ -534,8 +551,11 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
         const cursor = target.result;
         if (cursor) {
           const record = cursor.value;
+          const parts = record.fileName.split('/');
+
           files.push({
-            fileName: record.fileName.split('/').pop() || record.fileName,
+            // fileName: record.fileName.split('/').pop() || record.fileName,
+            fileName: record.fileName.substring(record.directory.length + 1),
             directory: record.directory,
             fileType: record.fileType || 'text'
           });
@@ -635,15 +655,15 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
    */
   async getBinaryFile(key: string): Promise<Uint8Array | null> {
     console.log("==>> getBinaryFile:", key);
-    
+
     await this.waitForReady();
-    
+
     // Проверяем кэш в памяти
-    const cacheKey = `cache/${key}`;
+    const cacheKey = `${key}`;
     if (this.fileCache.has(cacheKey)) {
       const cachedData = this.fileCache.get(cacheKey)!;
       console.log("==>> Found in memory cache");
-      
+
       if (cachedData instanceof Uint8Array) {
         return cachedData;
       } else if (typeof cachedData === 'string') {
@@ -656,15 +676,15 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
         }
       }
     }
-    
+
     try {
       console.log("==>> Loading from IndexedDB");
       // Загружаем из IndexedDB как бинарные данные
       const data = await this.indexedDBHelper.loadFile('.balancy', key);
-      
+
       if (data) {
         let binaryData: Uint8Array;
-        
+
         if (data instanceof ArrayBuffer) {
           binaryData = new Uint8Array(data);
         } else {
@@ -675,18 +695,18 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
             binaryData = new TextEncoder().encode(data);
           }
         }
-        
+
         // Кэшируем для будущих вызов
         this.fileCache.set(cacheKey, binaryData);
         this.existsCache.set(cacheKey, true);
-        
+
         console.log("==>> Successfully loaded binary data:", binaryData.length, "bytes");
         return binaryData;
       }
     } catch (error) {
       console.error('Error loading binary file:', error);
     }
-    
+
     console.log("==>> Binary file not found");
     return null;
   }
@@ -709,16 +729,19 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
   async saveBinaryFile(key: string, data: Uint8Array): Promise<boolean> {
     try {
       await this.waitForReady();
-      
+
       // Кэшируем в памяти
-      const cacheKey = `cache/${key}`;
+      const cacheKey = `${key}`;
       this.fileCache.set(cacheKey, new Uint8Array(data)); // Создаем копию
       this.existsCache.set(cacheKey, true);
-      
+
+      console.log("Saving:: " + key);
+
+
       // Сохраняем в IndexedDB
       const arrayBuffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
       await this.indexedDBHelper.saveFileInCacheBinaryCallback(key, arrayBuffer);
-      
+
       return true;
     } catch (error) {
       console.error('Error saving binary file:', error);
@@ -730,13 +753,13 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
    * Проверить существование файла в кеше
    */
   async hasFile(key: string): Promise<boolean> {
-    const cacheKey = `cache/${key}`;
-    
+    const cacheKey = `${key}`;
+
     // Проверяем кэш в памяти
     if (this.existsCache.has(cacheKey)) {
       return this.existsCache.get(cacheKey)!;
     }
-    
+
     // Проверяем в IndexedDB
     if (this.isReady) {
       try {
@@ -748,7 +771,7 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
         return false;
       }
     }
-    
+
     return false;
   }
 
@@ -758,11 +781,11 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
   async deleteFile(key: string): Promise<boolean> {
     try {
       await this.waitForReady();
-      
-      const cacheKey = `cache/${key}`;
+
+      const cacheKey = `${key}`;
       this.fileCache.delete(cacheKey);
       this.existsCache.set(cacheKey, false);
-      
+
       await this.indexedDBHelper.deleteCachedFileCallback(key);
       return true;
     } catch (error) {
@@ -777,14 +800,14 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
   async clearCache(): Promise<boolean> {
     try {
       await this.waitForReady();
-      
+
       // Очищаем кэш в памяти
       this.fileCache.clear();
       this.existsCache.clear();
-      
+
       // Очищаем IndexedDB (здесь нужно добавить метод в IndexedDBFileHelper)
       // Пока просто очищаем кэш в памяти
-      
+
       return true;
     } catch (error) {
       console.error('Error clearing cache:', error);
