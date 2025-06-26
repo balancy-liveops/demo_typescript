@@ -86,6 +86,10 @@ export class IndexedDBFileHelper implements JSFileHelper {
     this.resourcesDir = paths.resourcesPath;
   }
 
+  public getCachedDirectory(): string {
+    return this.cacheDir;
+  }
+
   private async ensureInitialized(): Promise<void> {
     if (!this.isInitialized) {
       await this.initIndexedDB();

@@ -277,7 +277,10 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
   }
 
   loadFileFromCacheCallback(fileName: string): string {
-    // Сначала проверяем кэш
+    const directory = this.indexedDBHelper.getCachedDirectory();
+    if (fileName.startsWith(directory))
+      fileName = fileName.substring(directory.length + 1); // Убираем префикс директории
+
     if (this.fileCache.has(fileName)) {
       const cachedData = this.fileCache.get(fileName)!;
 
