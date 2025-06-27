@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { initializeBalancy, BalancyConfigParams } from './balancyLoader';
 import { Balancy, Environment } from '@balancy/core';
+import { BalancyMainUI } from './components/BalancyMainUI'; // Import the new component
 
 const STORAGE_KEY = 'balancy_connection_info';
 
@@ -198,25 +199,113 @@ const App: React.FC = () => {
         );
     }
 
+    if (!isConnected) {
+        return (
+            <div style={styles.content}>
+                <h1>Balancy Dashboard</h1>
+                <p>Please provide connection parameters in the URL or they will be loaded from localStorage if available.</p>
+                <p>Required URL parameters:</p>
+                <ul>
+                    <li><code>game_id</code> - Your Balancy Game ID</li>
+                    <li><code>public_key</code> - Your Balancy Public Key</li>
+                    <li><code>environment</code> - development/stage/production (optional, defaults to development)</li>
+                    <li><code>device_id</code> - Device ID (optional)</li>
+                    <li><code>app_version</code> - App Version (optional, defaults to 1.0.0)</li>
+                </ul>
+            </div>
+        );
+    }
+
     return (
-        <div>
-            Hello World
+        <div style={styles.container}>
+            {/* Navigation Bar */}
+            <nav style={styles.nav}>
+                <div style={styles.navLeft}>
+                    {/*<span style={styles.configBadge}>*/}
+                    {/*    {getEnvironmentName(currentConfig!.environment)}*/}
+                    {/*</span>*/}
+                    <span>Game ID: {currentConfig!.apiGameId}</span>
+                </div>
+                <div style={styles.navRight}>
+                    <button style={styles.resetButton} onClick={handleReset}>
+                        Reset Profile
+                    </button>
+                    {/*<button style={styles.disconnectButton} onClick={disconnectFromBalancy}>*/}
+                    {/*    Disconnect*/}
+                    {/*</button>*/}
+                </div>
+            </nav>
+
+            {/* Main Content Area */}
+            <div style={styles.mainContent}>
+                <h1 style={styles.title}>Game Simulation Screen</h1>
+                <p style={styles.subtitle}>
+                    Active events and offers will appear on the left and right sides of the screen
+                </p>
+
+                {/* Simulated game content */}
+                <div style={styles.gameContent}>
+                    <div style={styles.gameArea}>
+                        <h2>🎮 Game Area</h2>
+                        <p>This simulates your main game screen.</p>
+                        <p>Check the sides for active events and offers!</p>
+
+                        <div style={styles.gameStats}>
+                            <div style={styles.stat}>
+                                <span>👑 Level</span>
+                                <span>42</span>
+                            </div>
+                            <div style={styles.stat}>
+                                <span>💰 Coins</span>
+                                <span>15,430</span>
+                            </div>
+                            <div style={styles.stat}>
+                                <span>💎 Gems</span>
+                                <span>87</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Balancy UI - Events and Offers on sides */}
+            <BalancyMainUI />
         </div>
     );
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
+    container: {
+        height: '100vh',
+        width: '100vw',
+        backgroundColor: '#1a1a2e',
+        color: '#fff',
+        fontFamily: 'Arial, sans-serif',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        overflow: 'hidden',
+        margin: 0,
+        padding: 0
+    },
     nav: {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#f0f0f0',
-        padding: '10px',
+        backgroundColor: 'rgba(15, 15, 30, 0.9)',
+        padding: '15px 20px',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        backdropFilter: 'blur(10px)',
+        height: '70px',
+        boxSizing: 'border-box'
     },
     navLeft: {
         display: 'flex',
-        gap: '10px',
+        gap: '15px',
         flexWrap: 'wrap',
+        alignItems: 'center'
     },
     navRight: {
         display: 'flex',
@@ -226,36 +315,98 @@ const styles: { [key: string]: React.CSSProperties } = {
     configBadge: {
         backgroundColor: '#28a745',
         color: 'white',
-        padding: '4px 8px',
-        borderRadius: '4px',
+        padding: '6px 12px',
+        borderRadius: '6px',
         fontSize: '12px',
         fontWeight: 'bold',
-    },
-    tab: {
-        margin: '0 10px',
-        textDecoration: 'none',
-        color: '#007bff',
-        fontWeight: 'bold',
+        textTransform: 'uppercase'
     },
     resetButton: {
         backgroundColor: '#dc3545',
         color: '#fff',
         border: 'none',
-        borderRadius: '4px',
-        padding: '8px 16px',
+        borderRadius: '6px',
+        padding: '10px 16px',
         cursor: 'pointer',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        transition: 'background-color 0.2s'
     },
     disconnectButton: {
         backgroundColor: '#f0ad4e',
         color: '#fff',
         border: 'none',
-        borderRadius: '4px',
-        padding: '8px 16px',
+        borderRadius: '6px',
+        padding: '10px 16px',
         cursor: 'pointer',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        transition: 'background-color 0.2s'
+    },
+    mainContent: {
+        padding: '20px 140px',
+        textAlign: 'center',
+        height: 'calc(100vh - 70px)',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        boxSizing: 'border-box'
+    },
+    title: {
+        fontSize: '2.2em',
+        marginBottom: '10px',
+        color: '#3498db'
+    },
+    subtitle: {
+        fontSize: '1.1em',
+        color: '#95a5a6',
+        marginBottom: '30px'
+    },
+    gameContent: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1
+    },
+    gameArea: {
+        backgroundColor: 'rgba(52, 73, 94, 0.3)',
+        borderRadius: '20px',
+        padding: '40px',
+        border: '2px solid rgba(52, 152, 219, 0.3)',
+        maxWidth: '500px',
+        width: '100%'
+    },
+    gameStats: {
+        display: 'flex',
+        justifyContent: 'space-around',
+        marginTop: '25px',
+        gap: '15px'
+    },
+    stat: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '8px',
+        backgroundColor: 'rgba(44, 62, 80, 0.5)',
+        padding: '15px',
+        borderRadius: '10px',
+        flex: 1
     },
     content: {
-        padding: '20px',
+        padding: '40px',
         textAlign: 'center',
+        height: '100vh',
+        width: '100vw',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#1a1a2e',
+        color: '#fff',
+        overflow: 'hidden',
+        margin: 0,
+        boxSizing: 'border-box'
     },
     loaderContainer: {
         display: 'flex',
@@ -263,18 +414,24 @@ const styles: { [key: string]: React.CSSProperties } = {
         justifyContent: 'center',
         alignItems: 'center',
         height: '100vh',
+        width: '100vw',
+        backgroundColor: '#1a1a2e',
+        color: '#fff',
+        overflow: 'hidden',
+        margin: 0,
+        padding: 0
     },
     loader: {
         width: '50px',
         height: '50px',
-        border: '5px solid #ccc',
-        borderTop: '5px solid #007bff',
+        border: '5px solid #2c3e50',
+        borderTop: '5px solid #3498db',
         borderRadius: '50%',
         animation: 'spin 1s linear infinite',
     },
     loadingInfo: {
         marginTop: '10px',
-        color: '#666',
+        color: '#95a5a6',
     },
 };
 
@@ -285,6 +442,40 @@ function addKeyframes() {
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        * {
+            margin: 0 !important;
+            padding: 0 !important;
+            box-sizing: border-box !important;
+        }
+        html {
+            overflow: hidden !important;
+            height: 100% !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        body {
+            overflow: hidden !important;
+            height: 100% !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+        }
+        #root {
+            height: 100vh !important;
+            width: 100vw !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
         }
     `;
     document.head.appendChild(style);
