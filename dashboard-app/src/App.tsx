@@ -443,11 +443,6 @@ function addKeyframes() {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        * {
-            margin: 0 !important;
-            padding: 0 !important;
-            box-sizing: border-box !important;
-        }
         html {
             overflow: hidden !important;
             height: 100% !important;

@@ -149,10 +149,10 @@ const BalancySection: React.FC<BalancySectionProps> = ({ placement, side }) => {
     // First, add element to state with priority but without icon
     setActiveElements(prev => {
       const newMap = new Map(prev);
-      newMap.set(id, { 
+      newMap.set(id, {
         element: <div key={id}>Loading...</div>, // Temporary placeholder
-        priority, 
-        id 
+        priority,
+        id
       });
       return newMap;
     });
@@ -166,8 +166,10 @@ const BalancySection: React.FC<BalancySectionProps> = ({ placement, side }) => {
           getSecondsLeft={getSecondsLeft}
           onClick={() => {
             if (viewModel.unnyView) {
-              // TODO: Implement view opening - viewModel.unnyView.openView(null, owner)
-              console.log('Opening view:', viewModel.unnyView.id || 'Unknown');
+                console.log('Opening view:', viewModel.unnyView.id || 'Unknown');
+                viewModel.unnyView.openView((success)=>{
+                    console.log("OPENED> " + success);
+                }, null);
             } else {
               alert("This element doesn't have a View associated with it.");
             }
