@@ -28,6 +28,10 @@ const App: React.FC = () => {
             url.searchParams.set('app_version', config.appVersion);
         }
 
+        if (config.branchName) {
+            url.searchParams.set('branch_name', config.branchName);
+        }
+
         // Update URL without navigation
         window.history.replaceState({}, '', url.toString());
     };
@@ -96,13 +100,15 @@ const App: React.FC = () => {
         const urlEnvironment = queryParams.get('environment');
         const urlDeviceId = queryParams.get('device_id');
         const urlAppVersion = queryParams.get('app_version');
+        const urlBranchName = queryParams.get('branch_name');
 
         return {
             apiGameId: urlGameId,
             publicKey: urlPublicKey,
             environment: urlEnvironment ? parseEnvironment(urlEnvironment) : Environment.Development,
             deviceId: urlDeviceId || undefined,
-            appVersion: urlAppVersion || '1.0.0'
+            appVersion: urlAppVersion || undefined,
+            branchName: urlBranchName || undefined
         };
     };
 
@@ -113,7 +119,14 @@ const App: React.FC = () => {
         addKeyframes();
 
         // Check URL parameters first
-        const urlConfig = getConfigFromUrl();
+        // const urlConfig = getConfigFromUrl();
+
+        const urlConfig = {
+            apiGameId: "02c41b42-4b80-11f0-b81a-1fec53a055ba",
+            publicKey: "YmQzMGI1NGQwZDVjNTRiMDZkMzg1Yj",
+            environment: Environment.Development,
+            branchName: "dev"
+        };
 
         if (urlConfig) {
             // If URL has all required params, connect with them

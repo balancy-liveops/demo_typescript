@@ -249,6 +249,19 @@ const ConnectPage: React.FC<ConnectPageProps> = ({ onConnect }) => {
                     />
                 </div>
 
+                <div style={styles.inputGroup}>
+                    <label htmlFor="branchName" style={styles.label}>Branch Name:</label>
+                    <input
+                        type="text"
+                        id="branchName"
+                        name="branchName"
+                        value={config.branchName}
+                        onChange={handleInputChange}
+                        placeholder="Optional"
+                        style={styles.input}
+                    />
+                </div>
+
                 <div style={styles.buttonContainer}>
                     <button
                         onClick={handleConnect}

@@ -3,7 +3,7 @@ import {
     Balancy,
     Environment,
     BalancyPlatform,
-    SmartObjectsStoreItem,
+    SmartObjectsStoreItem, SmartObjectsGameEvent,
 } from '@balancy/core';
 
 import {Utils} from "./Utils";
@@ -15,6 +15,7 @@ export interface BalancyConfigParams {
     environment: Environment;
     deviceId?: string;
     appVersion?: string;
+    branchName?: string;
 }
 
 export const initializeBalancy = async (configParams: BalancyConfigParams): Promise<void> => {
@@ -31,6 +32,9 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
 
     // Set deviceId - use provided or generate/retrieve one
     config.deviceId = configParams.deviceId || getOrCreateDeviceId();
+
+    if (configParams.branchName)
+        config.branchName = configParams.branchName;
 
     // Fixed customId for now
     config.customId = 'Custom456';
