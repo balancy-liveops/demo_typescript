@@ -8,12 +8,6 @@ interface UseCachedSpriteResult {
     reload: () => void;
 }
 
-/**
- * Хук для загрузки и кеширования спрайтов
- * @param sprite UnnyObject спрайт для загрузки
- * @param enableCache включить ли кеширование (по умолчанию true)
- * @returns объект с URL спрайта, состоянием загрузки и методом перезагрузки
- */
 export const useCachedSprite = (
     sprite: UnnyObject | null | undefined,
     enableCache: boolean = true
@@ -34,7 +28,6 @@ export const useCachedSprite = (
         setError(null);
 
         if (enableCache) {
-            console.log("==>> Загрузка спрайта с кешированием: ", sprite.id);
             sprite.loadSprite((url) => {
                 console.log("==>> Loaded ", url);
                 if (url) {
@@ -42,9 +35,7 @@ export const useCachedSprite = (
                     setError(null);
                 } else {
                     // Fallback на обычный URL
-                    console.warn('Ошибка загрузки кешированного спрайта, используем fallback');
                     setSpriteUrl(sprite.getFullUrl());
-                    setError('Ошибка кеширования, используется прямая загрузка');
                 }
                 setIsLoading(false);
             });
