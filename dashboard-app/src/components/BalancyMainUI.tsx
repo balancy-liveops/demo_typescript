@@ -3,6 +3,8 @@ import {Balancy, Callbacks, IViewModel, JsonBasedObject} from '@balancy/core';
 import { SmartObjectsViewPlacement } from '@balancy/core';
 
 // Types and interfaces
+type SpriteCallback = (blobUrl: string | null) => void;
+
 interface ElementInfo {
   element: React.ReactElement;
   priority: number;
@@ -142,30 +144,53 @@ const BalancySection: React.FC<BalancySectionProps> = ({ placement, side }) => {
       return;
     }
 
-    const iconUrl = viewModel.icon?.getFullUrl();
     const priority = viewModel.unnyPriority || 0;
 
-    const element = (
-      <BalancyElement
-        key={id}
-        iconUrl={iconUrl}
-        getSecondsLeft={getSecondsLeft}
-        onClick={() => {
-          if (viewModel.unnyView) {
-            // TODO: Implement view opening - viewModel.unnyView.openView(null, owner)
-            console.log('Opening view:', viewModel.unnyView.id || 'Unknown');
-          } else {
-            alert("This element doesn't have a View associated with it.");
-          }
-        }}
-      />
-    );
-
+    // First, add element to state with priority but without icon
     setActiveElements(prev => {
       const newMap = new Map(prev);
-      newMap.set(id, { element, priority, id });
+      newMap.set(id, { 
+        element: <div key={id}>Loading...</div>, // Temporary placeholder
+        priority, 
+        id 
+      });
       return newMap;
     });
+
+    // Callback function for when icon loads
+    const onIconLoaded = (blobUrl: string | null) => {
+      const element = (
+        <BalancyElement
+          key={id}
+          iconUrl={blobUrl || undefined}
+          getSecondsLeft={getSecondsLeft}
+          onClick={() => {
+            if (viewModel.unnyView) {
+              // TODO: Implement view opening - viewModel.unnyView.openView(null, owner)
+              console.log('Opening view:', viewModel.unnyView.id || 'Unknown');
+            } else {
+              alert("This element doesn't have a View associated with it.");
+            }
+          }}
+        />
+      );
+
+      setActiveElements(prev => {
+        const newMap = new Map(prev);
+        if (newMap.has(id)) { // Only update if element still exists
+          newMap.set(id, { element, priority, id });
+        }
+        return newMap;
+      });
+    };
+
+    // Load icon asynchronously
+    if (viewModel.icon) {
+      viewModel.icon.loadSprite(onIconLoaded);
+    } else {
+      // No icon, call callback with null
+      onIconLoaded(null);
+    }
   }, [placement]);
 
   const removeElement = useCallback((id: string) => {
