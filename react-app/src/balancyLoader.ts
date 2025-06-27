@@ -4,11 +4,8 @@ import {
     Environment,
     BalancyPlatform,
     SmartObjectsStoreItem,
-    SmartObjectsGameEvent,
-    FileHelperManager
 } from '@balancy/core';
-// import { FileHelperClassBrowser } from "./FileHelperClassBrowser";
-import {IndexedDBFileHelper} from "./IndexedDBFileHelper";
+
 import {Utils} from "./Utils";
 import {IndexedDBFileHelperAdapter} from "./IndexedDBFileHelperAdapter";
 
