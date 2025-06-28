@@ -63,8 +63,8 @@ const BalancyElement: React.FC<BalancyElementProps> = ({ iconUrl, getSecondsLeft
       className="balancy-element"
       onClick={onClick}
       style={{
-        width: '100px',
-        height: '100px',
+        width: '70px',
+        height: '70px',
         margin: '5px 0',
         backgroundColor: '#2c3e50',
         borderRadius: '8px',
@@ -92,8 +92,8 @@ const BalancyElement: React.FC<BalancyElementProps> = ({ iconUrl, getSecondsLeft
       {/* Icon */}
       <div
         style={{
-          width: '80px',
-          height: '80px',
+          width: '50px',
+          height: '50px',
           borderRadius: '4px',
           backgroundImage: iconUrl ? `url(${iconUrl})` : 'none',
           backgroundSize: 'cover',
@@ -113,7 +113,7 @@ const BalancyElement: React.FC<BalancyElementProps> = ({ iconUrl, getSecondsLeft
       {timeLeft && (
         <div
           style={{
-            fontSize: '16px',
+            fontSize: '12px',
             color: '#ecf0f1',
             fontWeight: 'bold',
             textAlign: 'center',
@@ -337,7 +337,7 @@ const BalancySection: React.FC<BalancySectionProps> = ({ placement, side }) => {
         top: '80px', // Lowered to be below header
         bottom: '20px',
         [side]: '10px',
-        width: '120px',
+        width: '90px',
         // backgroundColor: 'rgba(44, 62, 80, 0.9)',
         // borderRadius: '12px',
         // padding: '10px',
