@@ -169,7 +169,7 @@ const BalancySection: React.FC<BalancySectionProps> = ({ placement, side }) => {
                 console.log('Opening view:', viewModel.unnyView.id || 'Unknown');
                 viewModel.unnyView.openView((success)=>{
                     console.log("OPENED> " + success);
-                }, null);
+                }, owner);
             } else {
               alert("This element doesn't have a View associated with it.");
             }

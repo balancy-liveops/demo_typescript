@@ -122,8 +122,10 @@ const App: React.FC = () => {
         // const urlConfig = getConfigFromUrl();
 
         const urlConfig = {
-            apiGameId: "02c41b42-4b80-11f0-b81a-1fec53a055ba",
-            publicKey: "YmQzMGI1NGQwZDVjNTRiMDZkMzg1Yj",
+            // apiGameId: "02c41b42-4b80-11f0-b81a-1fec53a055ba",
+            // publicKey: "YmQzMGI1NGQwZDVjNTRiMDZkMzg1Yj",
+            apiGameId: "65133930-4d25-11f0-b843-1fec53a055ba",
+            publicKey: "OTk3ZThkYjEzNjU5MDhiZmMxMzdjMj",
             environment: Environment.Development,
             branchName: "dev"
         };
