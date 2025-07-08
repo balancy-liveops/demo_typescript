@@ -18,7 +18,7 @@ const App: React.FC = () => {
         // Add all config parameters to URL
         url.searchParams.set('game_id', config.apiGameId);
         url.searchParams.set('public_key', config.publicKey);
-        url.searchParams.set('environment', environmentToString(config.environment));
+        url.searchParams.set('environment', Number(config.environment).toString());
 
         if (config.deviceId) {
             url.searchParams.set('device_id', config.deviceId);
@@ -67,6 +67,9 @@ const App: React.FC = () => {
 
     // Helper functions for environment conversion
     const parseEnvironment = (value: string): Environment => {
+        if (!isNaN(Number(value)))
+            return Number(value) as Environment;
+
         switch (value.toLowerCase()) {
             case 'production':
                 return Environment.Production;
@@ -119,16 +122,16 @@ const App: React.FC = () => {
         addKeyframes();
 
         // Check URL parameters first
-        // const urlConfig = getConfigFromUrl();
+        const urlConfig = getConfigFromUrl();
 
-        const urlConfig = {
-            // apiGameId: "02c41b42-4b80-11f0-b81a-1fec53a055ba",
-            // publicKey: "YmQzMGI1NGQwZDVjNTRiMDZkMzg1Yj",
-            apiGameId: "65133930-4d25-11f0-b843-1fec53a055ba",
-            publicKey: "OTk3ZThkYjEzNjU5MDhiZmMxMzdjMj",
-            environment: Environment.Development,
-            branchName: "dev"
-        };
+        // const urlConfig = {
+        //     // apiGameId: "02c41b42-4b80-11f0-b81a-1fec53a055ba",
+        //     // publicKey: "YmQzMGI1NGQwZDVjNTRiMDZkMzg1Yj",
+        //     apiGameId: "65133930-4d25-11f0-b843-1fec53a055ba",
+        //     publicKey: "OTk3ZThkYjEzNjU5MDhiZmMxMzdjMj",
+        //     environment: Environment.Development,
+        //     branchName: "dev"
+        // };
 
         if (urlConfig) {
             // If URL has all required params, connect with them
