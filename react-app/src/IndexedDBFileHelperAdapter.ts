@@ -55,7 +55,7 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
     try {
       await this.indexedDBHelper.createSubDirectoryInCacheCallback('init');
       this.isReady = true;
-      console.log('IndexedDB FileHelper initialized successfully');
+      // console.log('IndexedDB FileHelper initialized successfully');
     } catch (error) {
       console.error('Failed to initialize IndexedDB FileHelper:', error);
       throw error;
@@ -105,17 +105,17 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
   }
 
   public fileExistsInCacheCallback(path: string): boolean {
-    console.log("fileExistsInCacheCallback " + path);
+    // console.log("fileExistsInCacheCallback " + path);
     const cacheKey = `${path}`;
     if (this.existsCache.has(cacheKey)) {
-      console.log("cache hit for existsCache: " + cacheKey + " => " + this.existsCache.get(cacheKey));
+      // console.log("cache hit for existsCache: " + cacheKey + " => " + this.existsCache.get(cacheKey));
       return this.existsCache.get(cacheKey)!;
     }
 
     // Если нет в кэше, проверяем IndexedDB
     if (this.isReady) {
       this.indexedDBHelper.fileExistsInCacheCallback(path).then(exists => {
-        console.log("DB for existsCache: " + cacheKey + " => " + this.existsCache.get(cacheKey));
+        // console.log("DB for existsCache: " + cacheKey + " => " + this.existsCache.get(cacheKey));
         this.existsCache.set(cacheKey, exists);
       }).catch(error => {
         console.error('Error checking file existence in cache:', error);
@@ -123,8 +123,18 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
       });
     }
 
-    console.warn(`File ${path} not found in cache, returning false: this.isReady = ${this.isReady}`);
+    // console.warn(`File ${path} not found in cache, returning false: this.isReady = ${this.isReady}`);
     return false;
+  }
+
+  public getUrlCachePathCallback(id: string, path: string): void {
+    if (!this.isReady) {
+      console.warn('IndexedDB not ready yet, returning empty path');
+      return;
+    }
+
+    // Возвращаем путь к кэшу
+    this.indexedDBHelper.getUrlCachePathCallback(id, path);
   }
 
   public getCachePathCallback(path: string): string {
@@ -174,7 +184,7 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
   }
 
   saveFileInCacheBinaryCallback(fileName: string, memoryView: Uint8Array): void {
-    console.log('saveFileInCacheBinaryCallback... ' + fileName + ' data: ' + memoryView.length + ' bytes');
+    // console.log('saveFileInCacheBinaryCallback... ' + fileName + ' data: ' + memoryView.length + ' bytes');
 
     if (!this.isReady) {
       console.warn('IndexedDB not ready yet, queuing operation');
@@ -194,11 +204,11 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
     this.fileCache.set(fileName, dataCopy);
     this.existsCache.set(fileName, true);
 
-    console.log('=>DONE saveFileInCacheBinaryCallback... ' + fileName + ' data: ' + memoryView.length + ' bytes');
+    // console.log('=>DONE saveFileInCacheBinaryCallback... ' + fileName + ' data: ' + memoryView.length + ' bytes');
 
     // Асинхронно сохраняем в IndexedDB
     this.indexedDBHelper.saveFileInCacheBinaryCallback(fileName, arrayBuffer).then(()=>{
-      console.log('ALL Saved!!');
+      // console.log('ALL Saved!!');
     }).catch(error => {
       console.error('Error saving binary file to cache:', error);
       this.fileCache.delete(fileName);
@@ -307,7 +317,7 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
       });
     }
 
-    console.warn(`File ${fileName} not found in cache, returning empty string`);
+    // console.warn(`File ${fileName} not found in cache, returning empty string`);
     return '';
   }
 
@@ -338,7 +348,7 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
       });
     }
 
-    console.warn(`Resource ${fileName} not found in cache, returning empty string`);
+    // console.warn(`Resource ${fileName} not found in cache, returning empty string`);
     return '';
   }
 
@@ -470,9 +480,9 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
       // Сначала покажем все файлы в базе для отладки
       const allFiles = await this.getAllFilesFromIndexedDB();
       console.log('🗂️ All files in IndexedDB:', allFiles.length);
-      allFiles.forEach(file => {
-        console.log(`  - ${file.directory}/${file.fileName} (${file.fileType})`);
-      });
+      // allFiles.forEach(file => {
+      //   console.log(`  - ${file.directory}/${file.fileName} (${file.fileType})`);
+      // });
 
       // Предзагружаем все найденные файлы напрямую
       for (const fileInfo of allFiles) {
@@ -501,12 +511,12 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
               const uint8Array = new Uint8Array(data);
               this.fileCache.set(cacheKey, uint8Array);
               totalSize += uint8Array.byteLength;
-              console.log(`✅ Loaded BINARY: ${cacheKey} (${uint8Array.byteLength} bytes)`);
+              // console.log(`✅ Loaded BINARY: ${cacheKey} (${uint8Array.byteLength} bytes)`);
             } else {
               // Текстовые файлы сохраняем как строки
               this.fileCache.set(cacheKey, data);
               totalSize += data.length;
-              console.log(`✅ Loaded TEXT: ${cacheKey} (${data.length} chars)`);
+              // console.log(`✅ Loaded TEXT: ${cacheKey} (${data.length} chars)`);
             }
 
             this.existsCache.set(cacheKey, true);
@@ -657,7 +667,7 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
    * Получить бинарные данные файла по ключу
    */
   async getBinaryFile(key: string): Promise<Uint8Array | null> {
-    console.log("==>> getBinaryFile:", key);
+    // console.log("==>> getBinaryFile:", key);
 
     await this.waitForReady();
 
@@ -665,7 +675,7 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
     const cacheKey = `${key}`;
     if (this.fileCache.has(cacheKey)) {
       const cachedData = this.fileCache.get(cacheKey)!;
-      console.log("==>> Found in memory cache");
+      // console.log("==>> Found in memory cache");
 
       if (cachedData instanceof Uint8Array) {
         return cachedData;
@@ -681,7 +691,7 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
     }
 
     try {
-      console.log("==>> Loading from IndexedDB");
+      // console.log("==>> Loading from IndexedDB");
       // Загружаем из IndexedDB как бинарные данные
       const data = await this.indexedDBHelper.loadFile('.balancy', key);
 
@@ -703,7 +713,7 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
         this.fileCache.set(cacheKey, binaryData);
         this.existsCache.set(cacheKey, true);
 
-        console.log("==>> Successfully loaded binary data:", binaryData.length, "bytes");
+        // console.log("==>> Successfully loaded binary data:", binaryData.length, "bytes");
         return binaryData;
       }
     } catch (error) {
@@ -738,7 +748,7 @@ export class IndexedDBFileHelperAdapter implements ICachedFileHelper {
       this.fileCache.set(cacheKey, new Uint8Array(data)); // Создаем копию
       this.existsCache.set(cacheKey, true);
 
-      console.log("Saving:: " + key);
+      // console.log("Saving:: " + key);
 
 
       // Сохраняем в IndexedDB
