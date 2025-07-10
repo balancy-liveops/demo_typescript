@@ -34,7 +34,7 @@ const App: React.FC = () => {
         // Add all config parameters to URL
         url.searchParams.set('game_id', config.apiGameId);
         url.searchParams.set('public_key', config.publicKey);
-        url.searchParams.set('environment', environmentToString(config.environment));
+        url.searchParams.set('environment', Number(config.environment).toString());
 
         if (config.deviceId) {
             url.searchParams.set('device_id', config.deviceId);
@@ -83,6 +83,9 @@ const App: React.FC = () => {
 
     // Helper functions for environment conversion
     const parseEnvironment = (value: string): Environment => {
+        if (!isNaN(Number(value)))
+            return Number(value) as Environment;
+
         switch (value.toLowerCase()) {
             case 'production':
                 return Environment.Production;

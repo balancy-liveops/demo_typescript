@@ -1,3 +1,5 @@
+import {DataObjectsManager} from "@balancy/core";
+
 export interface FileHelperPaths {
   cachePath: string;
   codePath?: string;
@@ -51,6 +53,7 @@ export interface JSFileHelper {
   fileExistsInResourcesCallback: (fileName: string) => Promise<boolean>;
 
   // Получение путей
+  getUrlCachePathCallback: (id: string, fileName: string) => void;
   getCachePathCallback: (fileName: string) => string;
   getResourcesPathCallback: (fileName: string) => string;
 
@@ -374,8 +377,13 @@ export class IndexedDBFileHelper implements JSFileHelper {
     return await this.fileExists(this.resourcesDir, fileName);
   }
 
+  getUrlCachePathCallback(id: string, fileName: string): void {
+    DataObjectsManager.loadSprite(id, (path) => {
+
+    });
+  }
+
   getCachePathCallback(fileName: string): string {
-    console.log("----- " + this.getFullPath(this.cacheDir, fileName));
     return this.getFullPath(this.cacheDir, fileName);
   }
 

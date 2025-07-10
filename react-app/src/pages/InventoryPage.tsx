@@ -43,6 +43,7 @@ const InventorySlotView: React.FC<InventorySlotViewProps> = ({ slot }) => {
 
 const InventoryPage: React.FC = () => {
     const [currencies, setCurrencies] = useState<SmartObjectsInventorySlot[]>([]);
+    const [eventItems, setEventItems] = useState<SmartObjectsInventorySlot[]>([]);
     const [items, setItems] = useState<SmartObjectsInventorySlot[]>([]);
 
     const refreshInventory = () => {
@@ -59,6 +60,7 @@ const InventoryPage: React.FC = () => {
 
         const inventories = profile.inventories;
         setCurrencies(inventories.currencies.slots.toArray());
+        setEventItems(inventories.eventItems.slots.toArray());
         setItems(inventories.items.slots.toArray());
     };
 
@@ -75,6 +77,16 @@ const InventoryPage: React.FC = () => {
                 <h3>Currencies</h3>
                 <div style={styles.horizontalScroll}>
                     {currencies.map((slot, index) => (
+                        <InventorySlotView key={`currency-${index}`} slot={slot} />
+                    ))}
+                </div>
+            </div>
+
+            {/* Event Items */}
+            <div>
+                <h3>Event Items</h3>
+                <div style={styles.horizontalScroll}>
+                    {eventItems.map((slot, index) => (
                         <InventorySlotView key={`currency-${index}`} slot={slot} />
                     ))}
                 </div>
