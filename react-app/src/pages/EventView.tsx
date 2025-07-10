@@ -7,6 +7,42 @@ interface EventViewProps {
     isActive: boolean;
 }
 
+const RewardLineTitle: React.FC<{ available: boolean, rewardLine: any }> = ({ available, rewardLine }) => {
+    const [accessItemIconUrl, setAccessItemIconUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (rewardLine?.accessItem?.icon) {
+            rewardLine.accessItem.icon.loadSprite((url: string | null) => {
+                setAccessItemIconUrl(url);
+            });
+        }
+    }, [available, rewardLine]);
+
+    return (
+        <div style={styles.rewardLineTitleContainer}>
+            <div style={styles.rewardLineTitleContent}>
+                <span style={styles.rewardLineTitleText}>
+                    {rewardLine.name?.value || 'Unknown Reward Line'}
+                </span>
+                {rewardLine.accessItem && (
+                    <div style={styles.accessItemContainer}>
+                        {accessItemIconUrl && (
+                            <img
+                                src={accessItemIconUrl}
+                                alt="Access Item Icon"
+                                style={styles.accessItemIcon}
+                            />
+                        )}
+                        {available && (
+                            <span style={styles.checkmark}>✓</span>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
 const RewardCell: React.FC<{ reward: any; myProgress?: any; scoreIndex: number }> = ({ reward, myProgress, scoreIndex }) => {
     const [itemIconUrl, setItemIconUrl] = useState<string | null>(null);
     const [isHovered, setIsHovered] = useState(false);
@@ -139,11 +175,7 @@ const BattlePassView: React.FC<{ battlePassEvent: LiveOpsBattlePassGameEvent; is
 
     const currentLevel = calculateCurrentLevel();
     const currentPlayerScore = battlePassInfo?.scores || 0;
-    // console.log(">>> " + Balancy.Profiles?.system?.battlePassesInfo.toJsonString(true));
-    console.log("0:: " + battlePassEvent.config.toJsonString(0,true));
-    console.log("1:: " + battlePassEvent.config.toJsonString(1,true));
-    // const rewardLine = Balancy.CMS.getModelByUnnyId<LiveOpsBattlePassRewardLine>("4694");
-    console.log("2:: " + battlePassEvent.config.toJsonString(2, true));
+
     return (
         <div style={styles.battlePassContainer}>
             <div style={styles.battlePassHeader}>
@@ -191,7 +223,7 @@ const BattlePassView: React.FC<{ battlePassEvent: LiveOpsBattlePassGameEvent; is
 
                         return (
                             <div key={lineIndex} style={styles.rewardLine}>
-                                <div style={styles.rewardLineTitle}>{rewardLine.name?.value || 'Unknown Reward Line'}</div>
+                                <RewardLineTitle available={myProgress?.available ?? false} rewardLine={rewardLine} />
                                 <div style={styles.rewardItems}>
                                     {scores.map((score, scoreIndex) => {
                                         const rewards = rewardLine.rewards || [];
@@ -345,6 +377,37 @@ const styles: { [key: string]: React.CSSProperties } = {
         fontSize: "14px",
         marginRight: "15px",
         color: "#333",
+    },
+    rewardLineTitleContainer: {
+        minWidth: "120px",
+        marginRight: "15px",
+    },
+    rewardLineTitleContent: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        gap: "4px",
+    },
+    rewardLineTitleText: {
+        fontWeight: "bold",
+        fontSize: "14px",
+        color: "#333",
+    },
+    accessItemContainer: {
+        display: "flex",
+        alignItems: "center",
+        gap: "4px",
+        marginTop: "2px",
+    },
+    accessItemIcon: {
+        width: "50px",
+        height: "50px",
+        objectFit: "contain",
+    },
+    checkmark: {
+        fontSize: "50px",
+        color: "#4CAF50",
+        fontWeight: "bold",
     },
     rewardItems: {
         display: "flex",
