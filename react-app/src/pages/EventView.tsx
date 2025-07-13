@@ -154,27 +154,14 @@ const BattlePassView: React.FC<{ battlePassEvent: LiveOpsBattlePassGameEvent; is
     // Calculate levels (starting from 1)
     const levels = scores.map((_, index) => index + 1);
 
+    if (!Balancy.Profiles?.system?.battlePassesInfo)
+        return null;
+
     const battlePassInfo = Balancy.Profiles?.system?.battlePassesInfo.findBattlePassInfo(battlePassEvent);
 
-    // Calculate current player level based on scores
-    const calculateCurrentLevel = () => {
-        let currentPlayerScore = battlePassInfo?.scores || 0;
-        let currentLevel = 0;
-
-        for (let i = 0; i < scores.length; i++) {
-            if (currentPlayerScore >= scores[i]) {
-                currentLevel = i + 1; // levels start from 1
-                currentPlayerScore -= scores[i];
-            } else {
-                break;
-            }
-        }
-
-        return currentLevel;
-    };
-
-    const currentLevel = calculateCurrentLevel();
-    const currentPlayerScore = battlePassInfo?.scores || 0;
+    const currentLevel = battlePassInfo ? battlePassInfo.level : -1;
+    const currentPlayerScore = battlePassInfo ? battlePassInfo.scores : -1;
+    const targetScores = scores.length > currentLevel ? scores[currentLevel] : 0;
 
     return (
         <div style={styles.battlePassContainer}>
@@ -196,8 +183,8 @@ const BattlePassView: React.FC<{ battlePassEvent: LiveOpsBattlePassGameEvent; is
                 <div style={styles.battlePassScrollContainer}>
                     {/* Current Score Display */}
                     <div style={styles.currentScoreDisplay}>
-                        <span style={styles.currentScoreText}>Текущие очки: {currentPlayerScore}</span>
-                        <span style={styles.currentLevelText}>Уровень: {currentLevel}</span>
+                        <span style={styles.currentLevelText}>Level: {currentLevel}</span>
+                        <span style={styles.currentScoreText}>Scores: {currentPlayerScore} / {targetScores}</span>
                     </div>
 
                     {/* Level indicators at the top */}

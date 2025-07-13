@@ -3,22 +3,27 @@ import { Balancy, SmartObjectsInventory, SmartObjectsInventorySlot } from "@bala
 
 interface InventorySlotViewProps {
     slot: SmartObjectsInventorySlot;
+    onInventoryChange: () => void;
 }
 
-const InventorySlotView: React.FC<InventorySlotViewProps> = ({ slot }) => {
-    const [amount, setAmount] = useState<number>(slot.item?.amount || 0);
-
+const InventorySlotView: React.FC<InventorySlotViewProps> = ({ slot, onInventoryChange }) => {
     const addItem = () => {
         if (slot.item) {
-            slot.item.amount++;
-            setAmount(slot.item.amount);
+            Balancy.API.Inventory.addItems(slot.item.item, 1);
+            // Добавляем небольшую задержку для обновления
+            setTimeout(() => {
+                onInventoryChange();
+            }, 10);
         }
     };
 
     const removeItem = () => {
         if (slot.item && slot.item.amount > 0) {
-            slot.item.amount--;
-            setAmount(slot.item.amount);
+            Balancy.API.Inventory.removeItems(slot.item.item, 1);
+            // Добавляем небольшую задержку для обновления
+            setTimeout(() => {
+                onInventoryChange();
+            }, 10);
         }
     };
 
@@ -28,7 +33,7 @@ const InventorySlotView: React.FC<InventorySlotViewProps> = ({ slot }) => {
                 <>
                     <h4>{slot.item.item.name.value}</h4>
                     <p>ID: {slot.item.item.unnyId}</p>
-                    <p>Amount: x{amount}</p>
+                    <p>Amount: x{slot.item.amount}</p>
                     <div style={styles.buttons}>
                         <button onClick={removeItem} style={styles.button}>-</button>
                         <button onClick={addItem} style={styles.button}>+</button>
@@ -45,6 +50,7 @@ const InventoryPage: React.FC = () => {
     const [currencies, setCurrencies] = useState<SmartObjectsInventorySlot[]>([]);
     const [eventItems, setEventItems] = useState<SmartObjectsInventorySlot[]>([]);
     const [items, setItems] = useState<SmartObjectsInventorySlot[]>([]);
+    const [updateKey, setUpdateKey] = useState(0); // Для принудительного обновления
 
     const refreshInventory = () => {
         if (!Balancy.Main.isReadyToUse) {
@@ -59,9 +65,10 @@ const InventoryPage: React.FC = () => {
         }
 
         const inventories = profile.inventories;
-        setCurrencies(inventories.currencies.slots.toArray());
-        setEventItems(inventories.eventItems.slots.toArray());
-        setItems(inventories.items.slots.toArray());
+        setCurrencies([...inventories.currencies.slots.toArray()]); // Создаем новый массив
+        setEventItems([...inventories.eventItems.slots.toArray()]); // Создаем новый массив
+        setItems([...inventories.items.slots.toArray()]); // Создаем новый массив
+        setUpdateKey(prev => prev + 1); // Обновляем ключ для принудительного рендера
     };
 
     useEffect(() => {
@@ -77,7 +84,11 @@ const InventoryPage: React.FC = () => {
                 <h3>Currencies</h3>
                 <div style={styles.horizontalScroll}>
                     {currencies.map((slot, index) => (
-                        <InventorySlotView key={`currency-${index}`} slot={slot} />
+                        <InventorySlotView 
+                            key={`currency-${index}-${updateKey}`} 
+                            slot={slot} 
+                            onInventoryChange={refreshInventory}
+                        />
                     ))}
                 </div>
             </div>
@@ -87,7 +98,11 @@ const InventoryPage: React.FC = () => {
                 <h3>Event Items</h3>
                 <div style={styles.horizontalScroll}>
                     {eventItems.map((slot, index) => (
-                        <InventorySlotView key={`currency-${index}`} slot={slot} />
+                        <InventorySlotView 
+                            key={`event-${index}-${updateKey}`} 
+                            slot={slot} 
+                            onInventoryChange={refreshInventory}
+                        />
                     ))}
                 </div>
             </div>
@@ -97,7 +112,11 @@ const InventoryPage: React.FC = () => {
                 <h3>Items</h3>
                 <div style={styles.horizontalScroll}>
                     {items.map((slot, index) => (
-                        <InventorySlotView key={`item-${index}`} slot={slot} />
+                        <InventorySlotView 
+                            key={`item-${index}-${updateKey}`} 
+                            slot={slot} 
+                            onInventoryChange={refreshInventory}
+                        />
                     ))}
                 </div>
             </div>
