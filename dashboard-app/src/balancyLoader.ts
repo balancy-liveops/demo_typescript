@@ -3,7 +3,7 @@ import {
     Balancy,
     Environment,
     BalancyPlatform,
-    SmartObjectsStoreItem,
+    SmartObjectsStoreItem, UnnyObject,
 } from '@balancy/core';
 
 import {Utils} from "./Utils";
@@ -80,6 +80,25 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
                 }
 
                 resolve(); // Balancy is fully initialized
+
+
+                // Example for Mark
+                // const simpleTestHtml = `
+                //     <html>
+                //         <head>
+                //             <title>Balancy Test View</title>
+                //         </head>
+                //         <body>
+                //             <h1>Balancy Test View</h1>
+                //             <button id="testButton">Click Me!</button>
+                //             <script>
+                //                 document.getElementById('testButton').addEventListener('click', function() {
+                //                     console.log('Button clicked!');
+                //                 });
+                //             </script>
+                //         </body>
+                //     </html>`;
+                // UnnyObject.setTestView("940", simpleTestHtml);
             }
         });
     });
