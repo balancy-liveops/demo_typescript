@@ -81,7 +81,8 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
 
                 resolve(); // Balancy is fully initialized
 
-                window.addEventListener('message', listenToParentMessages);
+                window.parent.addEventListener('message', listenToParentMessages);
+                console.log('Now listening to parent...');
                 // Example for Mark
                 // const simpleTestHtml = `
                 //     <html>
