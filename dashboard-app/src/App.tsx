@@ -451,7 +451,7 @@ const styles: { [key: string]: React.CSSProperties } = {
         transition: 'background-color 0.2s'
     },
     mainContent: {
-        padding: '20px 140px',
+        padding: '20px 100px',
         textAlign: 'center',
         height: 'calc(100vh - 70px)',
         display: 'flex',
@@ -543,7 +543,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     inventorySection: {
         backgroundColor: 'rgba(52, 73, 94, 0.3)',
         borderRadius: '20px',
-        padding: '30px',
+        padding: '5px',
         border: '2px solid rgba(52, 152, 219, 0.3)',
         marginTop: '30px',
         maxWidth: '800px',
@@ -552,7 +552,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     inventoryGrid: {
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))',
-        gap: '15px',
+        gap: '10px',
         marginTop: '20px'
     },
     inventoryItem: {
@@ -566,7 +566,7 @@ const styles: { [key: string]: React.CSSProperties } = {
         transition: 'all 0.2s ease',
         cursor: 'pointer',
         position: 'relative',
-        width: '80px'
+        width: '70px'
     },
     itemIconContainer: {
         width: '60px',
