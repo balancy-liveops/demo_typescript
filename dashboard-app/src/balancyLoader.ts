@@ -81,9 +81,7 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
 
                 resolve(); // Balancy is fully initialized
 
-                // For testing purposes, to find out the origin of this demo app
-                window.postMessage('BalancyInitialized', '*');
-                console.log('POST_MESSAGE');
+                window.addEventListener('message', listenToParentMessages);
                 // Example for Mark
                 // const simpleTestHtml = `
                 //     <html>
@@ -123,6 +121,53 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
     await initializationPromise;
     console.log('Balancy Data Synchronized and Ready!');
 };
+
+// Good name, and good life advice.
+function listenToParentMessages(event: MessageEvent) {
+    if (event.source !== window.parent) return;
+
+    const {
+        // Version of this messaging data structure, just in case we change it later
+        version,
+        // Two types for now: 'handshake' for getting the parent origin, and 'html' for getting the html data
+        type,
+    } = event.data;
+
+    if (version !== '1') {
+        console.error('Unsupported messaging version:', version);
+        return;
+    }
+
+    switch (type) {
+        case 'handshake': {
+            const response = {
+                version: '1',
+                type: 'handshake',
+                success: true,
+            };
+            event.source.postMessage(response, event.origin);
+            break;
+        }
+        case 'html': {
+            const html = event.data.html;
+            if (!html) return;
+
+            UnnyObject.setTestView("940", html);
+            break;
+        }
+        default: {
+            console.error('Unsupported message type:', type);
+            break;
+        }
+    }
+}
+
+function cleanup() {
+    // Remove event listeners or any other cleanup tasks
+    // This should be called in the return of the App useEffect
+    window.removeEventListener('message', listenToParentMessages);
+    console.log('Balancy cleanup completed.');
+}
 
 // Helper function to get or create a persistent device ID
 function getOrCreateDeviceId(): string {
