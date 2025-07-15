@@ -83,6 +83,7 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
 
                 // For testing purposes, to find out the origin of this demo app
                 window.postMessage('BalancyInitialized', '*');
+                console.log('POST_MESSAGE');
                 // Example for Mark
                 // const simpleTestHtml = `
                 //     <html>
