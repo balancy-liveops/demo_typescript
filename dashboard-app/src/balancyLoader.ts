@@ -124,6 +124,7 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
 
 // Good name, and good life advice.
 function listenToParentMessages(event: MessageEvent) {
+    console.log('>CHILDEVENT', event.origin, event.data);
     if (event.source !== window.parent) return;
 
     const {
