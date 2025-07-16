@@ -248,7 +248,7 @@ const BalancySection: React.FC<BalancySectionProps> = ({ placement, side }) => {
 
     // Add events
     if (allEvents) {
-      for (let i = 0; i < allEvents.count; i++) {
+        for (let i = 0; i < allEvents.count; i++) {
         const eventInfo = allEvents.get(i);
         if (eventInfo) {
           tryToAddEvent(eventInfo);
@@ -307,6 +307,11 @@ const BalancySection: React.FC<BalancySectionProps> = ({ placement, side }) => {
       refreshAll();
     });
 
+    // Subscribe to profile reset start event to clean up the screen
+    const onProfileResetStartId = Callbacks.onProfileResetStart.subscribe(() => {
+      cleanUp();
+    });
+
     // Initial load if Balancy is ready
     if (Balancy.Main.isReadyToUse) {
       refreshAll();
@@ -321,6 +326,7 @@ const BalancySection: React.FC<BalancySectionProps> = ({ placement, side }) => {
       Callbacks.onNewOfferGroupActivated.unsubscribe(onNewOfferGroupActivatedId);
       Callbacks.onOfferGroupDeactivated.unsubscribe(onOfferGroupDeactivatedId);
       Callbacks.onDataUpdated.unsubscribe(onDataUpdatedId);
+      Callbacks.onProfileResetStart.unsubscribe(onProfileResetStartId);
     };
   }, [tryToAddEvent, tryToAddOffer, tryToAddOfferGroup, removeElement, refreshAll]);
 
