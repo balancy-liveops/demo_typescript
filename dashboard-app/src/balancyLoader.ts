@@ -139,11 +139,14 @@ function listenToParentMessages(event: MessageEvent) {
             break;
         }
         case 'html': {
-            const html = event.data.html;
-            if (!html) return;
+            const {
+                html,
+                viewId,
+            } = event.data;
+            if (!html || !viewId) return;
 
-            console.log('Received HTML:', html);
-            UnnyObject.setTestView("940", html);
+            console.log(`Received HTML for View '${viewId}':`, html);
+            UnnyObject.setTestView(viewId, html);
             break;
         }
         default: {
