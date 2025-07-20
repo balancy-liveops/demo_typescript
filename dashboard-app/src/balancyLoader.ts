@@ -3,11 +3,11 @@ import {
     Balancy,
     Environment,
     BalancyPlatform,
-    SmartObjectsStoreItem, UnnyObject,
+    SmartObjectsStoreItem, UnnyObject, BalancyHardProductInfo,
 } from '@balancy/core';
 
 import {Utils} from "./Utils";
-import {IndexedDBFileHelperAdapter} from "./IndexedDBFileHelperAdapter";
+import {IndexedDBFileHelperAdapter} from "@balancy/utils";
 
 export interface BalancyConfigParams {
     apiGameId: string;
@@ -16,6 +16,34 @@ export interface BalancyConfigParams {
     deviceId?: string;
     appVersion?: string;
     branchName?: string;
+}
+
+function preparePayments() {
+    Balancy.Actions.Ads.setAdWatchCallback((storeItem : SmartObjectsStoreItem) => {
+        console.log('Fake ad watched for:', storeItem?.name);
+        //TODO Implement your ad watch logic here
+        storeItem?.adWasWatched();
+    });
+
+    Balancy.Actions.Purchasing.setHardPurchaseCallback((productInfo) => {
+        console.log('Starting Purchase: ', productInfo?.productId);
+        const price = productInfo?.getStoreItem()?.price;
+        if (price) {
+            const paymentInfo = Utils.createTestPaymentInfo(price);
+            Balancy.API.finalizedHardPurchase(true, productInfo, paymentInfo);
+        } else
+            console.warn('No price information available for the product:', productInfo?.productId);
+        // Implement your hard purchase logic here
+    });
+
+    Balancy.Actions.Purchasing.setGetHardPurchaseInfoCallback((productId) => {
+        return new BalancyHardProductInfo(
+            "Test Purchase",
+            "Test Purchase Description",
+            "$9.99 USD",
+            9.99,
+            "USD");
+    });
 }
 
 export const initializeBalancy = async (configParams: BalancyConfigParams): Promise<void> => {
@@ -43,24 +71,7 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
     config.appVersion = configParams.appVersion || '1.0.0';
     config.engineVersion = 'React_1.0';
 
-    Balancy.Callbacks.clearAll();
-
-    Balancy.Actions.Ads.setAdWatchCallback((storeItem : SmartObjectsStoreItem) => {
-        console.log('Fake ad watched for:', storeItem?.name);
-        //TODO Implement your ad watch logic here
-        storeItem?.adWasWatched();
-    });
-
-    Balancy.Actions.Purchasing.setHardPurchaseCallback((productInfo) => {
-        console.log('Starting Purchase: ', productInfo?.productId);
-        const price = productInfo?.getStoreItem()?.price;
-        if (price) {
-            const paymentInfo = Utils.createTestPaymentInfo(price);
-            Balancy.API.finalizedHardPurchase(true, productInfo, paymentInfo);
-        } else
-            console.warn('No price information available for the product:', productInfo?.productId);
-        // Implement your hard purchase logic here
-    });
+    preparePayments();
 
     // Create a promise that resolves when Balancy is fully initialized
     const initializationPromise = new Promise<void>((resolve, reject) => {
@@ -82,24 +93,6 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
                 resolve(); // Balancy is fully initialized
 
                 window.addEventListener('message', listenToParentMessages);
-                console.log('Now listening to parent...');
-                // Example for Mark
-                // const simpleTestHtml = `
-                //     <html>
-                //         <head>
-                //             <title>Balancy Test View</title>
-                //         </head>
-                //         <body>
-                //             <h1>Balancy Test View</h1>
-                //             <button id="testButton">Click Me!</button>
-                //             <script>
-                //                 document.getElementById('testButton').addEventListener('click', function() {
-                //                     console.log('Button clicked!');
-                //                 });
-                //             </script>
-                //         </body>
-                //     </html>`;
-                // UnnyObject.setTestView("940", simpleTestHtml);
             }
         });
     });
@@ -109,10 +102,6 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
         cachePath: '.balancy'
     });
 
-    const stats = fileHelperAdapter.getCacheStats();
-    console.log(`📁 Files: ${stats.fileCount}, 💾 Memory: ${stats.memoryUsage}`);
-
-    // Initialize Balancy with the ready adapter
     await Balancy.Main.initializeFileHelper(fileHelperAdapter);
 
     await Balancy.Main.init(config);

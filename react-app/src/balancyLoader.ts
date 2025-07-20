@@ -7,7 +7,7 @@ import {
 } from '@balancy/core';
 
 import {Utils} from "./Utils";
-import {IndexedDBFileHelperAdapter} from "./IndexedDBFileHelperAdapter";
+import {IndexedDBFileHelperAdapter} from "@balancy/utils";
 
 export interface BalancyConfigParams {
     apiGameId: string;
@@ -61,6 +61,8 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
             console.warn('No price information available for the product:', productInfo?.productId);
         // Implement your hard purchase logic here
     });
+
+    Balancy.Callbacks.initExamplesWithLogs();
 
     // Create a promise that resolves when Balancy is fully initialized
     const initializationPromise = new Promise<void>((resolve, reject) => {
