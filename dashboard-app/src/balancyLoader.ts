@@ -37,11 +37,19 @@ function preparePayments() {
     });
 
     Balancy.Actions.Purchasing.setGetHardPurchaseInfoCallback((productId) => {
+        const allStoreItems = Balancy.CMS.getModels(SmartObjectsStoreItem, true);
+        let price = 0.01;
+        for (const storeItem of allStoreItems) {
+            if (storeItem?.price?.product?.productId === productId) {
+                price = storeItem.price.product.price;
+                break;
+            }
+        }
         return new BalancyHardProductInfo(
             "Test Purchase",
             "Test Purchase Description",
-            "$9.99 USD",
-            9.99,
+            `$${Number(price).toFixed(2)} USD`,
+            price,
             "USD");
     });
 }
