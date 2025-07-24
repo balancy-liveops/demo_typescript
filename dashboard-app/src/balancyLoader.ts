@@ -48,7 +48,7 @@ function preparePayments() {
         return new BalancyHardProductInfo(
             "Test Purchase",
             "Test Purchase Description",
-            `$${Number(price).toFixed(2)} USD`,
+            `$${Number(price).toFixed(2)}`,
             price,
             "USD");
     });
