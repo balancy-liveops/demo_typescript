@@ -256,10 +256,10 @@ const App: React.FC = () => {
                                 <Link to="/time" style={styles.tab}>Time</Link>
                             </div>
                             <div style={styles.navRight}>
-                                <span style={styles.configBadge}>
-                                    {getEnvironmentName(currentConfig.environment)}
-                                </span>
-                                <button style={styles.disconnectButton} onClick={disconnectFromBalancy}>Disconnect</button>
+                                {/*<span style={styles.configBadge}>*/}
+                                {/*    {getEnvironmentName(currentConfig.environment)}*/}
+                                {/*</span>*/}
+                                {/*<button style={styles.disconnectButton} onClick={disconnectFromBalancy}>Disconnect</button>*/}
                                 <button style={styles.resetButton} onClick={handleReset}>Reset</button>
                             </div>
                         </nav>

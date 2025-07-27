@@ -63,9 +63,11 @@ const GameEventsPage: React.FC = () => {
             {activeEvents.length > 0 && (
                 <div>
                     <h3>Active Events</h3>
-                    {activeEvents.map((event) => (
-                        <EventView key={event.unnyId} gameEvent={event} isActive={true} />
-                    ))}
+                    {activeEvents.map((event) => {
+                        return event ?
+                            <EventView key={event.unnyId} gameEvent={event} isActive={true}/>
+                            : null;
+                    })}
                 </div>
             )}
 
@@ -73,9 +75,11 @@ const GameEventsPage: React.FC = () => {
             {inactiveEvents.length > 0 && (
                 <div>
                     <h3>Not Active Events</h3>
-                    {inactiveEvents.map((event) => (
-                        <EventView key={event.unnyId} gameEvent={event} isActive={false} />
-                    ))}
+                    {inactiveEvents.map((event) => {
+                        return event ?
+                            <EventView key={event.unnyId} gameEvent={event} isActive={false}/>
+                            : null;
+                    })}
                 </div>
             )}
         </div>
