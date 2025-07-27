@@ -300,7 +300,7 @@ const styles: { [key: string]: React.CSSProperties } = {
         borderTop: 'none',
         borderRadius: '0 0 6px 6px',
         zIndex: 1000,
-        maxHeight: '300px',
+        maxHeight: '600px',
         overflowY: 'auto',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
     },

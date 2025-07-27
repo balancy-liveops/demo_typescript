@@ -230,10 +230,21 @@ const BattlePassView: React.FC<{ battlePassEvent: LiveOpsBattlePassGameEvent; is
 };
 
 const EventView: React.FC<EventViewProps> = ({ gameEvent, isActive }) => {
+    const [eventIconUrl, setEventIconUrl] = useState<string | null>(null);
+
     // Check if this is a BattlePass event
     if (gameEvent instanceof LiveOpsBattlePassGameEvent) {
         return <BattlePassView battlePassEvent={gameEvent} isActive={isActive} />;
     }
+
+    // Load event icon for regular events
+    useEffect(() => {
+        if (gameEvent.icon) {
+            gameEvent.icon.loadSprite((url: string | null) => {
+                setEventIconUrl(url);
+            });
+        }
+    }, [gameEvent]);
 
     // Regular event view
     const timeText = isActive
@@ -242,7 +253,16 @@ const EventView: React.FC<EventViewProps> = ({ gameEvent, isActive }) => {
 
     return (
         <div style={styles.container}>
-            <span style={styles.name}>{gameEvent.name?.value || 'Unknown Event'}</span>
+            <div style={styles.eventHeaderLeft}>
+                {eventIconUrl && (
+                    <img
+                        src={eventIconUrl}
+                        alt="Event Icon"
+                        style={styles.eventIcon}
+                    />
+                )}
+                <span style={styles.name}>{gameEvent.name?.value || 'Unknown Event'}</span>
+            </div>
             <span style={styles.time}>{timeText}</span>
         </div>
     );
@@ -289,6 +309,12 @@ const styles: { [key: string]: React.CSSProperties } = {
         display: "flex",
         alignItems: "center",
         gap: "10px",
+    },
+    eventHeaderLeft: {
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+        flex: 1,
     },
     eventIcon: {
         width: "32px",
