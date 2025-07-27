@@ -56,34 +56,80 @@ const GameEventsPage: React.FC = () => {
     }, []);
 
     return (
-        <div style={{ padding: "20px" }}>
-            <h2>Game Events</h2>
+        <div style={styles.pageContainer}>
+            <div style={styles.header}>
+                <h2 style={styles.title}>Game Events</h2>
+            </div>
 
-            {/* Active Events */}
-            {activeEvents.length > 0 && (
-                <div>
-                    <h3>Active Events</h3>
-                    {activeEvents.map((event) => {
-                        return event ?
-                            <EventView key={event.unnyId} gameEvent={event} isActive={true}/>
-                            : null;
-                    })}
-                </div>
-            )}
+            <div style={styles.scrollableContent}>
+                {/* Active Events */}
+                {activeEvents.length > 0 && (
+                    <div style={styles.eventSection}>
+                        <h3 style={styles.sectionTitle}>Active Events</h3>
+                        {activeEvents.map((event) => {
+                            return event ?
+                                <EventView key={event.unnyId} gameEvent={event} isActive={true}/>
+                                : null;
+                        })}
+                    </div>
+                )}
 
-            {/* Inactive Events */}
-            {inactiveEvents.length > 0 && (
-                <div>
-                    <h3>Not Active Events</h3>
-                    {inactiveEvents.map((event) => {
-                        return event ?
-                            <EventView key={event.unnyId} gameEvent={event} isActive={false}/>
-                            : null;
-                    })}
-                </div>
-            )}
+                {/* Inactive Events */}
+                {inactiveEvents.length > 0 && (
+                    <div style={styles.eventSection}>
+                        <h3 style={styles.sectionTitle}>Not Active Events</h3>
+                        {inactiveEvents.map((event) => {
+                            return event ?
+                                <EventView key={event.unnyId} gameEvent={event} isActive={false}/>
+                                : null;
+                        })}
+                    </div>
+                )}
+            </div>
         </div>
     );
+};
+
+const styles: { [key: string]: React.CSSProperties } = {
+    pageContainer: {
+        display: "flex",
+        flexDirection: "column",
+        height: "calc(100vh - 200px)", // Возвращаем 100vh
+        boxSizing: "border-box",
+    },
+    header: {
+        padding: "20px",
+        flexShrink: 0,
+        borderBottom: "1px solid #ddd",
+        backgroundColor: "#fff",
+        zIndex: 1,
+        boxSizing: "border-box",
+    },
+    title: {
+        margin: 0,
+        fontSize: "24px",
+        fontWeight: "bold",
+        color: "#333",
+    },
+    scrollableContent: {
+        flex: 1,
+        overflow: "auto", // Главное - оставляем скролл
+        padding: "20px",
+        paddingBottom: "40px", // Дополнительный отступ внизу
+        boxSizing: "border-box",
+    },
+    eventSection: {
+        marginBottom: "30px",
+    },
+    sectionTitle: {
+        margin: 0,
+        marginBottom: "15px",
+        fontSize: "20px",
+        fontWeight: "bold",
+        color: "#555",
+        borderBottom: "2px solid #ddd",
+        paddingBottom: "8px",
+    },
 };
 
 export default GameEventsPage;
