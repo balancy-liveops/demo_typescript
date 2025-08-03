@@ -5,6 +5,7 @@ import { Environment } from '@balancy/core';
 import ConnectPage from './pages/ConnectPage';
 import DashboardMode from './components/DashboardMode';
 import ReactAppMode from './components/ReactAppMode';
+import BalancySimpleIntegration, {SimpleBalancyConfig} from "./components/BalancySimpleIntegration";
 
 const STORAGE_KEY = 'balancy_connection_info';
 const RENDER_MODE_KEY = 'balancy_render_mode';
@@ -12,6 +13,24 @@ const RENDER_MODE_KEY = 'balancy_render_mode';
 export type RenderMode = 'dashboard' | 'react-app';
 
 const App: React.FC = () => {
+
+    // const config: SimpleBalancyConfig = {
+    //     apiGameId: '65133930-4d25-11f0-b843-1fec53a055ba',
+    //     publicKey: 'OTk3ZThkYjEzNjU5MDhiZmMxMzdjMj',
+    //     environment: Environment.Development,
+    // };
+    //
+    // return (
+    //     <div>
+    //         {/* Your app content */}
+    //         <BalancySimpleIntegration
+    //             config={config}
+    //             onReady={() => console.log('Balancy is ready!')}
+    //             onError={(error) => console.error('Balancy error:', error)}
+    //         />
+    //     </div>
+    // );
+
     const [loading, setLoading] = useState(false);
     const [isConnected, setIsConnected] = useState(false);
     const [currentConfig, setCurrentConfig] = useState<BalancyConfigParams | null>(null);
@@ -195,7 +214,7 @@ const App: React.FC = () => {
                 <div style={styles.loader}></div>
                 <p>Connecting to Balancy...</p>
                 {currentConfig && (
-                    <p style={styles.loadingInfo}>Game ID: {currentConfig.apiGameId}</p>
+                    <p style={styles.loadingInfo}>Game ID: {currentConfig?.apiGameId}</p>
                 )}
             </div>
         );
@@ -216,7 +235,7 @@ const App: React.FC = () => {
     // Render the appropriate mode
     if (renderMode === 'dashboard') {
         return (
-            <DashboardMode 
+            <DashboardMode
                 currentConfig={currentConfig!}
                 onToggleRenderMode={toggleRenderMode}
                 onDisconnect={disconnectFromBalancy}
@@ -225,7 +244,7 @@ const App: React.FC = () => {
     }
 
     return (
-        <ReactAppMode 
+        <ReactAppMode
             currentConfig={currentConfig!}
             onToggleRenderMode={toggleRenderMode}
             onDisconnect={disconnectFromBalancy}

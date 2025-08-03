@@ -1,4 +1,10 @@
-import {SmartObjectsPrice, Balancy, BalancyPaymentInfo} from "@balancy/core";
+import {
+    SmartObjectsPrice,
+    Balancy,
+    BalancyPaymentInfo,
+    SmartObjectsPriceType,
+    SmartObjectsStoreItem
+} from "@balancy/core";
 
 export class Utils {
     public static createTestPaymentInfo(price: SmartObjectsPrice): BalancyPaymentInfo {
@@ -35,5 +41,35 @@ export class Utils {
             const value = char === "x" ? random : (random & 0x3) | 0x8;
             return value.toString(16);
         });
+    }
+
+    public static getPriceString(storeItem: SmartObjectsStoreItem | null | undefined) {
+        let priceStr = "N/A.";
+        if (storeItem) {
+            switch (storeItem.price?.type) {
+                case SmartObjectsPriceType.Hard:
+                    priceStr = storeItem.price?.product ? `$ ${storeItem.price?.product?.price.toFixed(2)}` : `FREE`;
+                    break;
+                case SmartObjectsPriceType.Soft:
+                    let price = storeItem.price?.items;
+                    if (price && price.length > 0) {
+                        priceStr = '';
+                        for (let i = 0; i < price.length; i++) {
+                            let p = price[i];
+                            if (p && p.item) {
+                                priceStr += `${p.item.name.value} x ${p.count} \n`;
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                case SmartObjectsPriceType.Ads:
+                    priceStr = `▶️ ${storeItem.getAdsWatched()} / ${storeItem.price?.ads}`;
+                    break;
+                default:
+                    priceStr = "N/A..";
+            }
+        }
+        return priceStr;
     }
 }

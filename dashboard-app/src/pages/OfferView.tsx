@@ -4,6 +4,7 @@ import {
     SmartObjectsOfferInfo,
 } from "@balancy/core";
 import { TimeFormatter } from "../TimeFormatter";
+import {Utils} from "../Utils";
 
 interface OfferViewProps {
     offerInfo: SmartObjectsOfferInfo;
@@ -40,9 +41,7 @@ const OfferView: React.FC<OfferViewProps> = ({ offerInfo }) => {
     const spriteUrl = offerInfo.gameOffer?.sprite?.getFullUrl() || "";
     const iconUrl = offerInfo.gameOffer?.icon?.getFullUrl() || "";
 
-    let priceStr = "N/A";
-    if (offerInfo.gameOffer?.storeItem?.price?.product)
-        priceStr = `$ ${offerInfo.gameOffer?.storeItem?.price?.product?.price.toFixed(2)}`;
+    let priceStr = Utils.getPriceString(offerInfo.gameOffer?.storeItem);
 
     return (
         <div key={refreshKey} style={{ border: "1px solid #ccc", borderRadius: "5px", marginBottom: "10px", padding: "10px", maxWidth: "600px"}}>

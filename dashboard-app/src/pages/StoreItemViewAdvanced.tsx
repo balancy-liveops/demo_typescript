@@ -7,6 +7,7 @@ import {
     SmartObjectsShopSlot
 } from "@balancy/core";
 import { useCachedSprite } from "../hooks/useCachedSprite";
+import {Utils} from "../Utils";
 
 // Assuming you have a Slot type - adjust according to your actual Balancy types
 
@@ -25,12 +26,12 @@ const StoreItemViewAdvanced: React.FC<StoreItemViewAdvancedProps> = ({
     const [currentCanBuy, setCurrentCanBuy] = useState(originalCanBuy);
     const [secondsLeft, setSecondsLeft] = useState(0);
     const [isAvailable, setIsAvailable] = useState(true);
-    
+
     const timerRef = useRef<NodeJS.Timeout | null>(null);
 
     const storeSlot = shopSlot.slot;
     const storeItem = storeSlot?.storeItem;
-    
+
     // Используем хук для кеширования спрайтов
     const { spriteUrl, isLoading: isSpriteLoading, error: spriteError } = useCachedSprite(storeItem?.sprite);
 
@@ -116,32 +117,7 @@ const StoreItemViewAdvanced: React.FC<StoreItemViewAdvancedProps> = ({
         }
     };
 
-    let priceStr = "N/A";
-    if (storeItem) {
-        switch (storeItem.price?.type) {
-            case SmartObjectsPriceType.Hard:
-                priceStr = storeItem.price?.product ? `$ ${storeItem.price?.product?.price.toFixed(2)}` : `N/A`;
-                break;
-            case SmartObjectsPriceType.Soft:
-                let price = storeItem.price?.items;
-                if (price && price.length > 0) {
-                    priceStr = '';
-                    for (let i = 0; i < price.length; i++) {
-                        let p = price[i];
-                        if (p && p.item) {
-                            priceStr += `${p.item.name.value} x ${p.count} \n`;
-                            break;
-                        }
-                    }
-                }
-                break;
-            case SmartObjectsPriceType.Ads:
-                priceStr = `▶️ ${storeItem.getAdsWatched()} / ${storeItem.price?.ads}`;
-                break;
-            default:
-                priceStr = "N/A";
-        }
-    }
+    let priceStr = Utils.getPriceString(storeItem);
 
     // Function to get the display text for the slot type
     const getTypeDisplayText = (slotType: LiveOpsStoreSlotType): string => {
@@ -233,7 +209,7 @@ const StoreItemViewAdvanced: React.FC<StoreItemViewAdvancedProps> = ({
                         Загрузка...
                     </div>
                 )}
-                
+
                 {/* Показываем ошибку кеширования если есть */}
                 {spriteError && (
                     <div
@@ -254,7 +230,7 @@ const StoreItemViewAdvanced: React.FC<StoreItemViewAdvancedProps> = ({
                         ⚠️
                     </div>
                 )}
-                
+
                 <img
                     src={spriteUrl || ""}
                     alt="Sprite"

@@ -63,19 +63,12 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
         environment: configParams.environment,
     });
 
-    // Set platform (fixed value)
     config.balancyPlatform = BalancyPlatform.AndroidGooglePlay;
-
-    // Set deviceId - use provided or generate/retrieve one
     config.deviceId = configParams.deviceId || getOrCreateDeviceId();
 
     if (configParams.branchName)
         config.branchName = configParams.branchName;
 
-    // Fixed customId for now
-    config.customId = 'Custom456';
-
-    // Set app version
     config.appVersion = configParams.appVersion || '1.0.0';
     config.engineVersion = 'React_1.0';
 
@@ -105,7 +98,6 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
         });
     });
 
-    // Create and initialize the IndexedDB adapter in one line
     const fileHelperAdapter = await IndexedDBFileHelperAdapter.create({
         cachePath: '.balancy'
     });
@@ -115,7 +107,6 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
     await Balancy.Main.init(config);
     console.log('Balancy Initialized, waiting for data synchronization...');
 
-    // Wait for the initialization promise to resolve
     await initializationPromise;
     console.log('Balancy Data Synchronized and Ready!');
 };
