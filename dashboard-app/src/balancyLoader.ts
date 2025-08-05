@@ -73,6 +73,8 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
     config.engineVersion = 'React_1.0';
 
     preparePayments();
+    Balancy.Callbacks.clearAll();
+    Balancy.Callbacks.initExamplesWithLogs();
 
     // Create a promise that resolves when Balancy is fully initialized
     const initializationPromise = new Promise<void>((resolve, reject) => {
