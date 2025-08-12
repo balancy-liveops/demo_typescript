@@ -137,30 +137,40 @@ const styles: { [key: string]: React.CSSProperties } = {
         height: 'calc(100vh - 70px)',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
-        overflow: 'hidden',
+        // Изменяем с center на flex-start, чтобы контент не выходил за пределы экрана
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        // Убираем overflow: 'hidden', чтобы разрешить скролл внутри компонентов
+        overflow: 'visible',
         boxSizing: 'border-box'
     },
     title: {
         fontSize: '2.2em',
         marginBottom: '10px',
-        color: '#3498db'
+        color: '#3498db',
+        // Делаем заголовок не сжимаемым
+        flexShrink: 0
     },
     subtitle: {
         fontSize: '1.1em',
         color: '#95a5a6',
-        marginBottom: '30px'
+        marginBottom: '30px',
+        // Делаем подзаголовок не сжимаемым
+        flexShrink: 0
     },
     gameContent: {
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
-        flex: 1
+        alignItems: 'flex-start', // Изменяем с center на flex-start
+        flex: 1,
+        width: '100%',
+        // Ограничиваем высоту, чтобы не выходить за пределы доступного пространства
+        minHeight: 0, // Важно для правильной работы flex
     },
 
 };
 
-// Add CSS for hover effects
+// Add CSS for hover effects and custom scrollbar
 const styleSheet = document.createElement('style');
 styleSheet.type = 'text/css';
 styleSheet.innerHTML = `
@@ -176,6 +186,25 @@ styleSheet.innerHTML = `
     
     .item-button:active {
         transform: scale(0.95);
+    }
+
+    /* Кастомные стили для скроллбара в WebKit браузерах */
+    .inventory-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .inventory-container::-webkit-scrollbar-track {
+        background: rgba(52, 73, 94, 0.3);
+        border-radius: 4px;
+    }
+
+    .inventory-container::-webkit-scrollbar-thumb {
+        background: rgba(52, 152, 219, 0.5);
+        border-radius: 4px;
+    }
+
+    .inventory-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(52, 152, 219, 0.7);
     }
 `;
 document.head.appendChild(styleSheet);

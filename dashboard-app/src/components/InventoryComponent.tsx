@@ -48,8 +48,9 @@ const InventoryComponent: React.FC = () => {
 
     return (
         <div style={styles.inventorySection}>
-            <h2>🎒 Inventory</h2>
-            <div style={styles.inventoryGrid}>
+            <h2 style={styles.inventoryTitle}>🎒 Inventory</h2>
+            <div style={styles.inventoryContainer}>
+                <div style={styles.inventoryGrid}>
                 {allItems.map((item, index) => {
                     const itemCount = Balancy.API.Inventory.getTotalItemsCount(item);
 
@@ -99,6 +100,7 @@ const InventoryComponent: React.FC = () => {
                         </div>
                     );
                 })}
+                </div>
             </div>
         </div>
     );
@@ -108,17 +110,36 @@ const styles: { [key: string]: React.CSSProperties } = {
     inventorySection: {
         backgroundColor: 'rgba(52, 73, 94, 0.3)',
         borderRadius: '20px',
-        padding: '5px',
         border: '2px solid rgba(52, 152, 219, 0.3)',
         marginTop: '30px',
         maxWidth: '800px',
-        width: '100%'
+        width: '100%',
+        // Ограничиваем высоту компонента с учетом навигации, заголовков и отступов
+        maxHeight: 'calc(100vh - 350px)',
+        minHeight: '200px',
+        display: 'flex',
+        flexDirection: 'column',
+    },
+    inventoryTitle: {
+        margin: '10px 0',
+        padding: '0 15px',
+        fontSize: '1.2em',
+        flexShrink: 0, // Заголовок не сжимается
+    },
+    inventoryContainer: {
+        flex: 1, // Занимает оставшееся место
+        overflowY: 'auto', // Включаем вертикальный скролл
+        overflowX: 'hidden',
+        padding: '5px 15px 15px',
+        // Кастомный скроллбар для лучшего внешнего вида
+        scrollbarWidth: 'thin',
+        scrollbarColor: 'rgba(52, 152, 219, 0.5) rgba(52, 73, 94, 0.3)',
     },
     inventoryGrid: {
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))',
         gap: '10px',
-        marginTop: '20px'
+        paddingBottom: '10px', // Добавляем отступ снизу для лучшего скролла
     },
     inventoryItem: {
         display: 'flex',
