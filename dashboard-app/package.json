@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.tsx",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=3030 react-scripts start",
     "build": "react-scripts build",
     "balancy": "balancy"
   },
@@ -14,10 +14,9 @@
     "react-router-dom": "^7.1.1",
     "react-scripts": "^5.0.1"
   },
-  "proxy": "http://localhost:3000",
   "devDependencies": {
     "@balancy/cli": "^1.0.10",
-    "@balancy/core": "^1.1.12",
+    "@balancy/core": "^1.1.15",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "typescript": "^4.9.5"
