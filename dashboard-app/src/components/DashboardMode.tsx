@@ -17,7 +17,7 @@ const DashboardMode: React.FC<DashboardModeProps> = ({
     onDisconnect
 }) => {
 
-    const [level, setLevel] = useState<number>(1);
+    const [level, setLevel] = useState<number>(0);
     const [winStreak, setWinStreak] = useState<number>(0);
 
     const handleReset = () => {
@@ -30,7 +30,7 @@ const DashboardMode: React.FC<DashboardModeProps> = ({
     const updateGameStats = () => {
         if (Balancy.Profiles.system?.generalInfo) {
             const generalInfo = Balancy.Profiles.system.generalInfo as any;
-            setLevel(generalInfo.level || 1);
+            setLevel(generalInfo.level || 0);
             setWinStreak(generalInfo.winStreak || 0);
         } else {
             setLevel(1);
