@@ -49,7 +49,10 @@ const BalancyElement: React.FC<BalancyElementProps> = ({ iconUrl, getSecondsLeft
   useEffect(() => {
     const updateTimer = () => {
       const seconds = getSecondsLeft();
-      setTimeLeft(formatTime(seconds));
+      if (seconds < 0)
+        setTimeLeft('FINISHED');
+      else
+        setTimeLeft(formatTime(seconds));
     };
 
     // Update immediately
@@ -216,7 +219,7 @@ const BalancySection: React.FC<BalancySectionProps> = ({ placement, side }) => {
       eventInfo.gameEventUnnyId,
       eventInfo.gameEvent,
       eventInfo,
-      () => eventInfo.getSecondsLeftBeforeDeactivation()
+      () => eventInfo.isFinished ? -1 : eventInfo.getSecondsLeftBeforeDeactivation()
     );
   }, [addElementFromViewModel]);
 
