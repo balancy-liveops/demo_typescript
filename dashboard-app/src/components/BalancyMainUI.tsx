@@ -346,7 +346,7 @@ const BalancySection: React.FC<BalancySectionProps> = ({ placement, side }) => {
       className={`balancy-section balancy-section-${side}`}
       style={{
         position: 'fixed',
-        top: '80px', // Lowered to be below header
+        top: '140px', // Lowered to be below header and status
         bottom: '20px',
         [side]: '10px',
         width: '90px',
