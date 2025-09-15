@@ -18,6 +18,7 @@ import LanguagesPage from "../pages/LanguagesPage";
 import TimeCheatPage from "../pages/TimeCheatPage";
 import DailyBonusPage from "../pages/DailyBonusPage";
 import BalancyStatus from "../pages/BalancyStatus";
+import {commonHeaderStyles} from "./common/styles";
 
 interface ReactAppModeProps {
     currentConfig: BalancyConfigParams;
@@ -212,11 +213,8 @@ const RouteChangeHandler: React.FC<{ onRouteChange: () => void }> = ({ onRouteCh
 
 const styles: { [key: string]: React.CSSProperties } = {
     nav: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        ...commonHeaderStyles,
         backgroundColor: '#f0f0f0',
-        padding: '10px',
         position: 'relative'
     },
     navLeft: {
