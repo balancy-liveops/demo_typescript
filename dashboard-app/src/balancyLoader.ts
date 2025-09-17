@@ -9,6 +9,36 @@ import {
 import {Utils} from "./Utils";
 import {IndexedDBFileHelperAdapter} from "@balancy/utils";
 
+// Declare global types for TypeScript at the top level
+declare global {
+    interface Window {
+        Balancy: typeof Balancy;
+        currentBalancyConfig: BalancyConfigParams;
+        BalancyDebug: {
+            Balancy: typeof Balancy;
+            Main: typeof Balancy.Main;
+            CMS: typeof Balancy.CMS;
+            API: typeof Balancy.API;
+            Callbacks: typeof Balancy.Callbacks;
+            Actions: typeof Balancy.Actions;
+            Profiles: typeof Balancy.Profiles;
+            DataObjectsManager: typeof Balancy.DataObjectsManager;
+            
+            // Utility functions
+            isReady: () => boolean;
+            enableLogs: () => void;
+            clearAllCallbacks: () => void;
+            
+            // Debug functions
+            logStatus: () => void;
+            logProfiles: () => void;
+            logCMSData: () => void;
+            logSystemProfile: () => void;
+            call: (methodPath: string, ...args: any[]) => any;
+        };
+    }
+}
+
 export interface BalancyConfigParams {
     apiGameId: string;
     publicKey: string;
@@ -111,6 +141,12 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
 
     await initializationPromise;
     console.log('Balancy Data Synchronized and Ready!');
+
+    // Save config for debugging
+    (window as any).currentBalancyConfig = configParams;
+    
+    // Setup global access for debugging
+    setupGlobalBalancyAccess();
 };
 
 // Good name, and good life advice.
@@ -179,4 +215,118 @@ function getOrCreateDeviceId(): string {
     }
 
     return deviceId;
+}
+
+// Setup global access to Balancy SDK for debugging
+function setupGlobalBalancyAccess() {
+    // Create the BalancyDebug object with useful debugging functions
+    (window as any).BalancyDebug = {
+        // Main classes
+        Balancy,
+        Main: Balancy.Main,
+        CMS: Balancy.CMS,
+        API: Balancy.API,
+        Callbacks: Balancy.Callbacks,
+        Actions: Balancy.Actions,
+        Profiles: Balancy.Profiles,
+        DataObjectsManager: Balancy.DataObjectsManager,
+        
+        // Utility functions
+        isReady: () => Balancy.Main.isReadyToUse,
+        enableLogs: () => Balancy.Callbacks.initExamplesWithLogs(),
+        clearAllCallbacks: () => Balancy.Callbacks.clearAll(),
+        
+        // Debug functions
+        logStatus: () => {
+            console.group('🔍 Balancy Status');
+            console.log('IsReady:', Balancy.Main.isReadyToUse);
+            console.log('Environment:', (window as any).currentBalancyConfig?.environment);
+            console.log('Game ID:', (window as any).currentBalancyConfig?.apiGameId);
+            console.groupEnd();
+        },
+        
+        logProfiles: () => {
+            console.group('👤 Balancy Profiles');
+            console.log('System Profile:', Balancy.Profiles.system);
+            if (Balancy.Profiles.system) {
+                console.log('General Info:', Balancy.Profiles.system.generalInfo);
+                console.log('Smart Info:', Balancy.Profiles.system.smartInfo);
+                console.log('Live Ops Info:', Balancy.Profiles.system.liveOpsInfo);
+            }
+            console.groupEnd();
+        },
+        
+        logCMSData: () => {
+            console.group('📊 Balancy CMS Data');
+            try {
+                // Get all available model types and their data
+                console.log('Store Items:', Balancy.CMS.getModels(SmartObjectsStoreItem, true));
+                
+                // You can add more specific model types here as needed
+                console.log('CMS instance:', Balancy.CMS);
+            } catch (error) {
+                console.error('Error getting CMS data:', error);
+            }
+            console.groupEnd();
+        },
+        
+        logSystemProfile: () => {
+            console.group('⚙️ System Profile Details');
+            const systemProfile = Balancy.Profiles.system;
+            if (systemProfile) {
+                const generalInfo = systemProfile.generalInfo;
+                console.log('Profile ID:', generalInfo.profileId);
+                console.log('Country:', generalInfo.country);
+                console.log('First Login:', generalInfo.firstLoginTime);
+                console.log('Session:', generalInfo.session);
+                console.log('Play Time:', generalInfo.playTime);
+                console.log('Device Info:', {
+                    deviceId: generalInfo.deviceId,
+                    appVersion: generalInfo.appVersion,
+                    engineVersion: generalInfo.engineVersion
+                });
+            } else {
+                console.log('System profile not available');
+            }
+            console.groupEnd();
+        },
+        
+        // Universal method caller
+        call: (methodPath: string, ...args: any[]) => {
+            try {
+                const paths = methodPath.split('.');
+                let obj = Balancy as any;
+                
+                for (const path of paths) {
+                    obj = obj[path];
+                }
+                
+                if (typeof obj === 'function') {
+                    return obj.apply(Balancy, args);
+                } else {
+                    return obj;
+                }
+            } catch (error) {
+                console.error('❌ Error calling method:', methodPath, error);
+                return null;
+            }
+        }
+    };
+    
+    // Also make Balancy directly available
+    (window as any).Balancy = Balancy;
+    
+    console.log('✅ Balancy SDK is now available in console!');
+    console.log('📚 Available commands:');
+    console.log('  🔍 BalancyDebug.logStatus() - show SDK status');
+    console.log('  👤 BalancyDebug.logProfiles() - show profiles');
+    console.log('  📊 BalancyDebug.logCMSData() - show CMS data');
+    console.log('  ⚙️ BalancyDebug.logSystemProfile() - system profile details');
+    console.log('  🎯 BalancyDebug.call("Main.isReadyToUse") - call any method');
+    console.log('  📱 Balancy.Main, Balancy.CMS, Balancy.API - direct access');
+    console.log('');
+    console.log('🚀 Examples:');
+    console.log('  BalancyDebug.isReady()');
+    console.log('  BalancyDebug.call("CMS.getModels", SmartObjectsStoreItem, true)');
+    console.log('  Balancy.Profiles.system.generalInfo');
 }
