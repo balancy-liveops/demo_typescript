@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Balancy, SmartObjectsItem } from '@balancy/core';
+import {BalancyStatusMaxHeight} from '../pages/BalancyStatus';
 
 const InventoryComponent: React.FC = () => {
     const [inventoryRefreshTrigger, setInventoryRefreshTrigger] = useState(0);
@@ -115,7 +116,7 @@ const styles: { [key: string]: React.CSSProperties } = {
         maxWidth: '800px',
         width: '100%',
         // Ограничиваем высоту компонента с учетом навигации, заголовков и отступов
-        maxHeight: 'calc(100vh - 350px)',
+        maxHeight: `calc(100vh - 350px - ${BalancyStatusMaxHeight}px)`,
         minHeight: '200px',
         display: 'flex',
         flexDirection: 'column',
