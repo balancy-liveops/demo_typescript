@@ -74,7 +74,7 @@ export default function DeviceWrapper({
                         backgroundSize: `${mockupWidth} ${mockupHeight}`,
                         width: mockupWidth,
                         height: mockupHeight,
-                        transform: `${isLandscape ? 'rotate(-90deg)' : ''}`,
+                        transform: `${isLandscape ? 'rotate(-90deg)' : 'none'}`,
                         pointerEvents: 'none',
                     }}
                 ></div>

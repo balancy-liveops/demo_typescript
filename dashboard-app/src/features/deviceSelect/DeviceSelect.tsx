@@ -32,6 +32,7 @@ export default function DeviceSelect(props: DeviceSelectProps): JSX.Element | nu
                 {config.map(device => {
                     return (
                         <option
+                            key={device.id}
                             value={device.id}
                         >
                             {`${device.name} - ${device.width} x ${device.height}`}
