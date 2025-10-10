@@ -1,5 +1,5 @@
 import {
-    androidCompact,
+    androidCompact, androidMedium,
     iphone13Mini,
     iphone14,
     iphone14Plus,
@@ -50,6 +50,15 @@ export const PORTRAIT_DEVICES_CONFIG: DeviceConfig[] = [
         name:   'Android Medium',
         width:  700,
         height: 840,
+        mockup: {
+            image:         androidMedium,
+            paddingTop:    8,
+            paddingRight:  18,
+            paddingBottom: 19,
+            paddingLeft:   9,
+            borderRadius:  20,
+            pixelRatio: 1.5,
+        },
     },
     {
         id:     'iphone-16',

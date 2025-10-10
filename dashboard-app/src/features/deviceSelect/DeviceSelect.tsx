@@ -23,6 +23,7 @@ export default function DeviceSelect(props: DeviceSelectProps): JSX.Element | nu
             }}
         >
             <select
+                value={selectedDeviceId ?? 'none'}
                 onChange={event => {
                     const {value} = event.target as HTMLSelectElement;
                     setSelectedDeviceId(value);
@@ -58,6 +59,7 @@ export default function DeviceSelect(props: DeviceSelectProps): JSX.Element | nu
                         const isChecked = event.target.checked;
                         setIsLandscape(isChecked);
                         const withoutLandscape = selectedDeviceId?.replace('-landscape', '') ?? 'none';
+                        console.log('>TEST', withoutLandscape);
                         setSelectedDeviceId(isChecked ? `${withoutLandscape}-landscape` : withoutLandscape);
                     }}
                 />

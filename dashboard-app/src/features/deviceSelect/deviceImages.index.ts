@@ -8,6 +8,7 @@ import iphone14Plus from '../../assets/images/apple-iphone-14-plus-2022-medium.p
 import iphone13Mini from '../../assets/images/apple-iphone-13-mini-2021-medium.png';
 import iphoneSE from '../../assets/images/apple-iphone-se-medium.png';
 import androidCompact from '../../assets/images/samsung-galaxy-s24-ultra-2024-medium.png';
+import androidMedium from '../../assets/images/samsung-galaxy-fold-medium.png';
 
 export {
     iphone16,
@@ -20,4 +21,5 @@ export {
     iphone13Mini,
     iphoneSE,
     androidCompact,
+    androidMedium,
 };
