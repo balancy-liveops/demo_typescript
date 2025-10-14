@@ -29,7 +29,20 @@ export default function DeviceWrapper({
         }
     }
 
-    if (selectedDevice == null) return <div style={styles.container}>{children}</div>;
+    if (selectedDevice == null) {
+        return (
+            <div style={styles.container}>
+                <div
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                    }}
+                >
+                    {children}
+                </div>
+            </div>
+        )
+    }
 
     const {
         width,
@@ -49,6 +62,8 @@ export default function DeviceWrapper({
 
     const mockupWidth = `${(isLandscape ? height : width) + paddingLeft + paddingRight}px`;
     const mockupHeight = `${(isLandscape ? width : height) + paddingTop + paddingBottom}px`;
+    const currPaddingTop = isLandscape ? undefined : `${spaceForIsland * pixelRatio}px`;
+    const currPaddingLeft = isLandscape ? `${spaceForIsland * pixelRatio}px` : undefined;
     return (
         <div style={styles.container}>
             <div
@@ -58,13 +73,24 @@ export default function DeviceWrapper({
                     borderRadius,
                     overflow: 'hidden',
                     position: 'relative',
-                    paddingTop: isLandscape ? undefined : `${spaceForIsland * pixelRatio}px`,
-                    paddingLeft: isLandscape ? `${spaceForIsland * pixelRatio}px` : undefined,
+                    paddingTop: currPaddingTop,
+                    paddingLeft: currPaddingLeft,
                     transform: `scale(${pixelRatio ? 1 / pixelRatio : 1})`,
                     backgroundColor: '#1a1a2e',
                 }}
             >
                 {children}
+                <div
+                    id={'device-wrapper'}
+                    style={{
+                        position: 'absolute',
+                        top: currPaddingTop ?? 0,
+                        bottom: 0,
+                        left: currPaddingLeft ?? 0,
+                        right: 0,
+                        pointerEvents: 'none'
+                    }}
+                ></div>
             </div>
             {mockup != null && (
                 <div
