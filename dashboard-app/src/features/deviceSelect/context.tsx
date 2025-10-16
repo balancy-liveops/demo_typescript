@@ -1,14 +1,14 @@
 import React, {createContext, ReactNode, useContext, useState} from "react";
 import {DeviceConfig} from "./devicesConfig";
 
-export type DeviceSelectContextType = {
+type DeviceSelectContextType = {
     selectedDeviceId?: string;
     setSelectedDeviceId: (id?: string) => void;
     isLandscape: boolean;
     setIsLandscape: (landscape: boolean) => void;
 }
 
-export const DeviceSelectContext = createContext<DeviceSelectContextType>({
+const DeviceSelectContext = createContext<DeviceSelectContextType>({
     setSelectedDeviceId: ()=> {},
     isLandscape: false,
     setIsLandscape: ()=> {},

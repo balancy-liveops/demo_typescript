@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { BalancyConfigParams } from '../balancyLoader';
-import { Balancy } from '@balancy/core';
-import { BalancyMainUI } from './BalancyMainUI';
+import React, {useEffect, useState} from 'react';
+import {BrowserRouter as Router} from 'react-router-dom';
+import {BalancyConfigParams} from '../balancyLoader';
+import {Balancy} from '@balancy/core';
+import {BalancyMainUI} from './BalancyMainUI';
 import InventoryComponent from './InventoryComponent';
 import BalancyStatus from '../pages/BalancyStatus';
 import {commonHeaderStyles} from './common/styles';

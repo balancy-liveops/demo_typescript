@@ -3,11 +3,12 @@ import {
     Balancy,
     Environment,
     BalancyPlatform,
-    SmartObjectsStoreItem, UnnyObject, BalancyHardProductInfo,
+    SmartObjectsStoreItem, UnnyObject, BalancyHardProductInfo, SmartObjectsPrice,
 } from '@balancy/core';
 
 import {Utils} from "./Utils";
 import {IndexedDBFileHelperAdapter} from "@balancy/utils";
+import {IAPEventEmitter, IAPEvents} from "./features/simulateIAP";
 
 // Declare global types for TypeScript at the top level
 declare global {
@@ -57,10 +58,23 @@ function preparePayments() {
 
     Balancy.Actions.Purchasing.setHardPurchaseCallback((productInfo) => {
         console.log('Starting Purchase: ', productInfo?.productId);
+
         const price = productInfo?.getStoreItem()?.price;
         if (price) {
-            const paymentInfo = Utils.createTestPaymentInfo(price);
-            Balancy.API.finalizedHardPurchase(true, productInfo, paymentInfo);
+            const productName = productInfo?.getStoreItem()?.name.value || 'Unknown Product';
+            const priceValue = price.product?.price || 0;
+            IAPEventEmitter.emit(IAPEvents.IAP_OPENED, productName, `$${priceValue.toFixed(2)}`);
+            IAPEventEmitter.once(IAPEvents.IAP_PURCHASED, (isSuccess) => {
+                if (!isSuccess) {
+                    console.log('Purchase cancelled by user');
+                    Balancy.API.finalizedHardPurchase(false, productInfo, null);
+                    return;
+                }
+
+                console.log('User confirmed purchase');
+                const paymentInfo = Utils.createTestPaymentInfo(price);
+                Balancy.API.finalizedHardPurchase(true, productInfo, paymentInfo);
+            });
         } else
             console.warn('No price information available for the product:', productInfo?.productId);
         // Implement your hard purchase logic here
