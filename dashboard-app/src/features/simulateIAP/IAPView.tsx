@@ -5,6 +5,7 @@ import visaLogo from '../../assets/images/visa-logo.png';
 import royalLogo from '../../assets/images/royal-logo.png';
 import tappingIcon from '../../assets/images/tapping-icon.png';
 import IAPEventEmitter, {IAPEvents} from './events';
+import Spinner from "../../components/common/Spinner/Spinner";
 
 type IAPViewProps = {
 };
@@ -52,6 +53,7 @@ export default function IAPView(props: IAPViewProps): JSX.Element | null {
                 style={styles.container}
                 onClick={handleCloseIAP}
             >
+                <Spinner size={'2rem'}/>
                 <div
                     style={styles.panel}
                     onClick={handleConfirmIAP}
