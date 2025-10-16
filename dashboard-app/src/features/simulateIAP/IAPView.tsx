@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {CSSProperties, MouseEventHandler, useEffect, useState} from 'react';
-import applePayLogo from '../../assets/images/apple-pay-logo.png';
+import {CSSProperties, useEffect, useState} from 'react';
+import balancyLogo from '../../assets/images/balancy-logo.png';
 import visaLogo from '../../assets/images/visa-logo.png';
 import royalLogo from '../../assets/images/royal-logo.png';
 import tappingIcon from '../../assets/images/tapping-icon.png';
@@ -58,11 +58,14 @@ export default function IAPView(props: IAPViewProps): JSX.Element | null {
                     style={styles.panel}
                     onClick={handleConfirmIAP}
                 >
-                    <img
-                        src={applePayLogo}
-                        alt="Apple Pay Logo"
-                        style={styles.payLogo}
-                    />
+                    <div style={styles.payLogoContainer}>
+                        <img
+                            src={balancyLogo}
+                            alt="Balancy Logo"
+                            style={styles.payLogo}
+                        />
+                        <span style={styles.payLogoText}>Pay</span>
+                    </div>
                     <button
                         style={styles.closeButton}
                         onClick={handleCloseIAP}
@@ -225,12 +228,20 @@ const styles: Record<string, CSSProperties> = {
         borderRadius: '0.75rem 0.75rem 0 0',
         pointerEvents: 'initial',
     },
-    payLogo: {
-        height: '2rem',
+    payLogoContainer: {
         position: 'absolute',
         top: '1rem',
         left: '1rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0rem',
         pointerEvents: 'none',
+    },
+    payLogo: {
+        height: '2.5rem',
+    },
+    payLogoText: {
+        fontSize: '1.5rem'
     },
     closeButton: {
         position: 'absolute',
