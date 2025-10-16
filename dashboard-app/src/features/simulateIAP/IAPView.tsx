@@ -13,11 +13,13 @@ export default function IAPView(props: IAPViewProps): JSX.Element | null {
     const [isOpen, setIsOpen] = useState(false);
     const [price, setPrice] = useState('$0.00');
     const [productName, setProductName] = useState('Royal Pass');
+    const [productSprite, setProductSprite] = useState<string>()
 
     useEffect(() => {
-        function onOpen(name: string, price: string) {
+        function onOpen(name: string, price: string, sprite?: string) {
             setProductName(name);
             setPrice(price);
+            setProductSprite(sprite);
             setIsOpen(true);
         }
 
@@ -144,8 +146,8 @@ export default function IAPView(props: IAPViewProps): JSX.Element | null {
                         >
                             <div style={styles.purchaseInfoContainer}>
                                 <img
-                                    src={royalLogo}
-                                    alt="Royal Logo"
+                                    src={productSprite ?? royalLogo}
+                                    alt="Product Image"
                                     style={{
                                         height: '3.25rem',
                                     }}

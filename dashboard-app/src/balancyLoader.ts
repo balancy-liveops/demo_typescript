@@ -59,11 +59,19 @@ function preparePayments() {
     Balancy.Actions.Purchasing.setHardPurchaseCallback((productInfo) => {
         console.log('Starting Purchase: ', productInfo?.productId);
 
-        const price = productInfo?.getStoreItem()?.price;
+        const storeItem = productInfo?.getStoreItem();
+        const price = storeItem?.price;
         if (price) {
-            const productName = productInfo?.getStoreItem()?.name.value || 'Unknown Product';
+            const productName = storeItem?.name.value || 'Unknown Product';
             const priceValue = price.product?.price || 0;
-            IAPEventEmitter.emit(IAPEvents.IAP_OPENED, productName, `$${priceValue.toFixed(2)}`);
+            storeItem?.sprite?.loadSprite((url) => {
+                IAPEventEmitter.emit(
+                    IAPEvents.IAP_OPENED,
+                    productName,
+                    `$${priceValue.toFixed(2)}`,
+                    url ?? undefined
+                );
+            });
             IAPEventEmitter.once(IAPEvents.IAP_PURCHASED, (isSuccess) => {
                 if (!isSuccess) {
                     console.log('Purchase cancelled by user');

@@ -7,7 +7,7 @@ export enum IAPEvents {
 }
 
 type DefaultEventMap = {
-    [IAPEvents.IAP_OPENED]: (productName: string, price: string)=> void;
+    [IAPEvents.IAP_OPENED]: (productName: string, price: string, productSprite?: string)=> void;
     [IAPEvents.IAP_PURCHASED]: (isSuccess: boolean)=> void;
     [IAPEvents.IAP_ERROR]: (error: Error)=> void;
 }
