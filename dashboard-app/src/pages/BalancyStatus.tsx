@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Balancy } from "@balancy/core";
 
+export const BalancyStatusMaxHeight = 56;
+
 const BalancyStatus: React.FC = () => {
     // Store each value separately
     const initStatus = Balancy.API.getStatus();
@@ -54,10 +56,13 @@ const BalancyStatus: React.FC = () => {
             backgroundColor: "#333",
             color: "white",
             padding: "10px",
-            borderRadius: "8px",
             boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
             fontSize: "16px",
-            gap: "20px"
+            gap: "20px",
+            overflow: "hidden",
+            boxSizing: "border-box",
+            maxHeight: `${BalancyStatusMaxHeight}px`,
+            fontFamily: "Times, 'Times New Roman', serif",
         }}>
             <span><strong>Branch:</strong> {branchName}</span>
             <span><strong>Deploy:</strong> {deploy}</span>

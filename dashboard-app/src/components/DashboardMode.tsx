@@ -4,6 +4,8 @@ import { BalancyConfigParams } from '../balancyLoader';
 import { Balancy } from '@balancy/core';
 import { BalancyMainUI } from './BalancyMainUI';
 import InventoryComponent from './InventoryComponent';
+import BalancyStatus from '../pages/BalancyStatus';
+import {commonHeaderStyles} from './common/styles';
 
 interface DashboardModeProps {
     currentConfig: BalancyConfigParams;
@@ -83,6 +85,8 @@ const DashboardMode: React.FC<DashboardModeProps> = ({
                     </div>
                 </nav>
 
+                <BalancyStatus/>
+
                 {/* Main Content Area */}
                 <div style={styles.mainContent}>
                     <h1 style={styles.title}>Game Simulation</h1>
@@ -158,15 +162,10 @@ const styles: { [key: string]: React.CSSProperties } = {
         padding: 0
     },
     nav: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        ...commonHeaderStyles,
         backgroundColor: 'rgba(15, 15, 30, 0.9)',
-        padding: '15px 20px',
         borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
         backdropFilter: 'blur(10px)',
-        height: '70px',
-        boxSizing: 'border-box'
     },
     navLeft: {
         display: 'flex',
