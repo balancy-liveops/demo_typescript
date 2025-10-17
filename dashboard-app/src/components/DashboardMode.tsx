@@ -48,6 +48,12 @@ const DashboardMode: React.FC<DashboardModeProps> = ({
         updateGameStats();
     };
 
+    const handleOpenShop = () => {
+        Balancy.Profiles.system?.shopsInfo?.activeShopInfo?.shop?.unnyView?.openView((success: boolean)=> {
+            console.log("shop opened ? ", success);
+        }, Balancy.Profiles.system?.shopsInfo?.activeShopInfo);
+    };
+
     useEffect(() => {
         updateGameStats();
     }, []);
@@ -110,6 +116,16 @@ const DashboardMode: React.FC<DashboardModeProps> = ({
                             ❌ Lose
                         </button>
                     </div>
+
+                    {Balancy.Profiles.system?.shopsInfo?.activeShopInfo && (
+                        <div style={styles.shopButtonContainer}>
+                            <button
+                                style={{...styles.actionButton, ...styles.shopButton}}
+                                onClick={handleOpenShop}>
+                                🛒 Open Shop
+                            </button>
+                        </div>
+                    )}
 
                     {/* Simulated game content */}
                     <div style={styles.gameContent}>
@@ -257,6 +273,16 @@ const styles: { [key: string]: React.CSSProperties } = {
     },
     loseButton: {
         backgroundColor: '#e74c3c',
+        color: '#fff',
+    },
+    shopButtonContainer: {
+        display: 'flex',
+        justifyContent: 'center',
+        marginBottom: '20px',
+        flexShrink: 0
+    },
+    shopButton: {
+        backgroundColor: '#9b59b6',
         color: '#fff',
     },
     gameContent: {
