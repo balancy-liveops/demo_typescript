@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@balancy/cli": "^1.0.10",
-    "@balancy/core": "^1.1.29",
+    "@balancy/core": "^1.1.33",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "typescript": "^4.9.5"
