@@ -45,10 +45,11 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
 
     Balancy.Callbacks.clearAll();
 
-    Balancy.Actions.Ads.setAdWatchCallback((storeItem : SmartObjectsStoreItem) => {
-        console.log('Fake ad watched for:', storeItem?.name);
+    Balancy.Actions.Ads.setAdWatchCallback((callback: (success: boolean) => void) => {
+        console.log('Fake ad watched.');
         //TODO Implement your ad watch logic here
-        storeItem?.adWasWatched();
+        if (callback)
+            callback(true);
     });
 
     Balancy.Actions.Purchasing.setHardPurchaseCallback((productInfo) => {

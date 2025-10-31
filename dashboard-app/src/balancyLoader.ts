@@ -23,12 +23,12 @@ declare global {
             Actions: typeof Balancy.Actions;
             Profiles: typeof Balancy.Profiles;
             DataObjectsManager: typeof Balancy.DataObjectsManager;
-            
+
             // Utility functions
             isReady: () => boolean;
             enableLogs: () => void;
             clearAllCallbacks: () => void;
-            
+
             // Debug functions
             logStatus: () => void;
             logProfiles: () => void;
@@ -49,10 +49,11 @@ export interface BalancyConfigParams {
 }
 
 function preparePayments() {
-    Balancy.Actions.Ads.setAdWatchCallback((storeItem : SmartObjectsStoreItem) => {
-        console.log('Fake ad watched for:', storeItem?.name);
+    Balancy.Actions.Ads.setAdWatchCallback((callback: (success: boolean) => void) => {
+        console.log('Fake ad watched.');
         //TODO Implement your ad watch logic here
-        storeItem?.adWasWatched();
+        if (callback)
+            callback(true);
     });
 
     Balancy.Actions.Purchasing.setHardPurchaseCallback((productInfo) => {
@@ -144,7 +145,7 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
 
     // Save config for debugging
     (window as any).currentBalancyConfig = configParams;
-    
+
     // Setup global access for debugging
     setupGlobalBalancyAccess();
 };
@@ -230,12 +231,12 @@ function setupGlobalBalancyAccess() {
         Actions: Balancy.Actions,
         Profiles: Balancy.Profiles,
         DataObjectsManager: Balancy.DataObjectsManager,
-        
+
         // Utility functions
         isReady: () => Balancy.Main.isReadyToUse,
         enableLogs: () => Balancy.Callbacks.initExamplesWithLogs(),
         clearAllCallbacks: () => Balancy.Callbacks.clearAll(),
-        
+
         // Debug functions
         logStatus: () => {
             console.group('🔍 Balancy Status');
@@ -244,7 +245,7 @@ function setupGlobalBalancyAccess() {
             console.log('Game ID:', (window as any).currentBalancyConfig?.apiGameId);
             console.groupEnd();
         },
-        
+
         logProfiles: () => {
             console.group('👤 Balancy Profiles');
             console.log('System Profile:', Balancy.Profiles.system);
@@ -255,13 +256,13 @@ function setupGlobalBalancyAccess() {
             }
             console.groupEnd();
         },
-        
+
         logCMSData: () => {
             console.group('📊 Balancy CMS Data');
             try {
                 // Get all available model types and their data
                 console.log('Store Items:', Balancy.CMS.getModels(SmartObjectsStoreItem, true));
-                
+
                 // You can add more specific model types here as needed
                 console.log('CMS instance:', Balancy.CMS);
             } catch (error) {
@@ -269,7 +270,7 @@ function setupGlobalBalancyAccess() {
             }
             console.groupEnd();
         },
-        
+
         logSystemProfile: () => {
             console.group('⚙️ System Profile Details');
             const systemProfile = Balancy.Profiles.system;
@@ -290,17 +291,17 @@ function setupGlobalBalancyAccess() {
             }
             console.groupEnd();
         },
-        
+
         // Universal method caller
         call: (methodPath: string, ...args: any[]) => {
             try {
                 const paths = methodPath.split('.');
                 let obj = Balancy as any;
-                
+
                 for (const path of paths) {
                     obj = obj[path];
                 }
-                
+
                 if (typeof obj === 'function') {
                     return obj.apply(Balancy, args);
                 } else {
@@ -312,10 +313,10 @@ function setupGlobalBalancyAccess() {
             }
         }
     };
-    
+
     // Also make Balancy directly available
     (window as any).Balancy = Balancy;
-    
+
     console.log('✅ Balancy SDK is now available in console!');
     console.log('📚 Available commands:');
     console.log('  🔍 BalancyDebug.logStatus() - show SDK status');
