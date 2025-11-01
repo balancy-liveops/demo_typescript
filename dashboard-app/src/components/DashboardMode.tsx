@@ -6,6 +6,9 @@ import { BalancyMainUI } from './BalancyMainUI';
 import InventoryComponent from './InventoryComponent';
 import BalancyStatus from '../pages/BalancyStatus';
 import {commonHeaderStyles} from './common/styles';
+import DeviceSelect from "../features/deviceSelect/DeviceSelect";
+import {DeviceSelectProvider} from "../features/deviceSelect/context";
+import DeviceWrapper from "../features/deviceSelect/DeviceWrapper";
 
 interface DashboardModeProps {
     currentConfig: BalancyConfigParams;
@@ -62,97 +65,101 @@ const DashboardMode: React.FC<DashboardModeProps> = ({
 
     return (
         <Router>
-            <div style={styles.container}>
-                {/* Navigation Bar */}
-                <nav style={styles.nav}>
-                    <div style={styles.navLeft}>
-                        <button
-                            style={styles.modeToggleButton}
-                            onClick={onToggleRenderMode}
-                            title="Switch to React App Mode"
-                        >
-                            ⚙️ Console
-                        </button>
-                    </div>
-                    <div style={styles.navLeft}>
-                        {/*<span>Game ID: {currentConfig.apiGameId}</span>*/}
-                        <span>User ID: {Balancy.Profiles.system?.generalInfo ? (Balancy.Profiles.system.generalInfo as any).profileId : 'Loading...'}</span>
-                    </div>
-                    <div style={styles.navRight}>
-                        <button style={styles.resetButton} onClick={handleReset}>
-                            Reset
-                        </button>
-                    </div>
-                </nav>
+            <DeviceSelectProvider>
+                <DeviceWrapper>
+                    <div style={styles.container}>
+                        {/* Navigation Bar */}
+                        <nav style={styles.nav}>
+                            <div style={styles.navLeft}>
+                                <button
+                                    style={styles.modeToggleButton}
+                                    onClick={onToggleRenderMode}
+                                    title="Switch to React App Mode"
+                                >
+                                    ⚙️ Console
+                                </button>
+                            </div>
+                            <div style={styles.navLeft}>
+                                {/*<span>Game ID: {currentConfig.apiGameId}</span>*/}
+                                <span>User ID: {Balancy.Profiles.system?.generalInfo ? (Balancy.Profiles.system.generalInfo as any).profileId : 'Loading...'}</span>
+                                <DeviceSelect/>
+                            </div>
+                            <div style={styles.navRight}>
+                                <button style={styles.resetButton} onClick={handleReset}>
+                                    Reset
+                                </button>
+                            </div>
+                        </nav>
 
-                <BalancyStatus/>
+                        <BalancyStatus/>
 
-                {/* Main Content Area */}
-                <div style={styles.mainContent}>
-                    <h1 style={styles.title}>Game Simulation</h1>
+                        {/* Main Content Area */}
+                        <div style={styles.mainContent}>
+                            <h1 style={styles.title}>Game Simulation</h1>
 
-                    {/* Game Stats */}
-                    <div style={styles.gameStats}>
-                        <div style={styles.statItem}>
-                            <span style={styles.statLabel}>Current Level:</span>
-                            <span style={styles.statValue}>{level}</span>
+                            {/* Game Stats */}
+                            <div style={styles.gameStats}>
+                                <div style={styles.statItem}>
+                                    <span style={styles.statLabel}>Current Level:</span>
+                                    <span style={styles.statValue}>{level}</span>
+                                </div>
+                                <div style={styles.statItem}>
+                                    <span style={styles.statLabel}>Win Streak:</span>
+                                    <span style={styles.statValue}>{winStreak}</span>
+                                </div>
+                            </div>
+
+                            {/* Simulation Buttons */}
+                            <div style={styles.simulationButtons}>
+                                <button
+                                    className="action-button win-button"
+                                    style={{...styles.actionButton, ...styles.winButton}}
+                                    onClick={handleWin}
+                                >
+                                    🏆 Win
+                                </button>
+                                <button
+                                    className="action-button lose-button"
+                                    style={{...styles.actionButton, ...styles.loseButton}}
+                                    onClick={handleLose}
+                                >
+                                    ❌ Lose
+                                </button>
+                            </div>
+
+                            {Balancy.Profiles.system?.shopsInfo?.activeShopInfo && (
+                                <div style={styles.shopButtonContainer}>
+                                    <button
+                                        style={{...styles.actionButton, ...styles.shopButton}}
+                                        onClick={handleOpenShop}>
+                                        🛒 Open Shop
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Simulated game content */}
+                            <div style={styles.gameContent}>
+                                {/* Inventory Component */}
+                                <InventoryComponent />
+                            </div>
                         </div>
-                        <div style={styles.statItem}>
-                            <span style={styles.statLabel}>Win Streak:</span>
-                            <span style={styles.statValue}>{winStreak}</span>
-                        </div>
+
+                        {/* Balancy UI - Events and Offers on sides */}
+                        <BalancyMainUI />
                     </div>
-
-                    {/* Simulation Buttons */}
-                    <div style={styles.simulationButtons}>
-                        <button
-                            className="action-button win-button"
-                            style={{...styles.actionButton, ...styles.winButton}}
-                            onClick={handleWin}
-                        >
-                            🏆 Win
-                        </button>
-                        <button
-                            className="action-button lose-button"
-                            style={{...styles.actionButton, ...styles.loseButton}}
-                            onClick={handleLose}
-                        >
-                            ❌ Lose
-                        </button>
-                    </div>
-
-                    {Balancy.Profiles.system?.shopsInfo?.activeShopInfo && (
-                        <div style={styles.shopButtonContainer}>
-                            <button
-                                style={{...styles.actionButton, ...styles.shopButton}}
-                                onClick={handleOpenShop}>
-                                🛒 Open Shop
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Simulated game content */}
-                    <div style={styles.gameContent}>
-                        {/* Inventory Component */}
-                        <InventoryComponent />
-                    </div>
-                </div>
-
-                {/* Balancy UI - Events and Offers on sides */}
-                <BalancyMainUI />
-            </div>
+                </DeviceWrapper>
+            </DeviceSelectProvider>
         </Router>
     );
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
     container: {
-        height: '100vh',
-        width: '100vw',
-        backgroundColor: '#1a1a2e',
+        height: '100%',
+        width: '100%',
         color: '#fff',
         fontFamily: 'Arial, sans-serif',
-        position: 'fixed',
+        position: 'relative',
         top: 0,
         left: 0,
         right: 0,
@@ -169,6 +176,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     },
     navLeft: {
         display: 'flex',
+        flexDirection: 'column',
         gap: '15px',
         flexWrap: 'wrap',
         alignItems: 'center',
