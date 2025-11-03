@@ -2,6 +2,7 @@ import * as React from 'react';
 import {useDeviceSelectContext} from "./context";
 import {ReactElement, ReactNode, useMemo} from "react";
 import {ALL_DEVICES_CONFIG} from "./devicesConfig";
+import {IAPView} from "../simulateIAP";
 
 type DeviceWrapperProps = {
     children?: ReactNode;
@@ -39,6 +40,14 @@ export default function DeviceWrapper({
                     }}
                 >
                     {children}
+                    <div
+                        id={'device-wrapper'}
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                        }}
+                    ></div>
+                    <IAPView/>
                 </div>
             </div>
         )
@@ -66,7 +75,6 @@ export default function DeviceWrapper({
     return (
         <div style={styles.container}>
             <div
-                id={'device-wrapper'}
                 style={{
                     width: totalWidth,
                     minWidth: totalWidth,
@@ -81,6 +89,14 @@ export default function DeviceWrapper({
                 }}
             >
                 {children}
+                <div
+                    id={'device-wrapper'}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                    }}
+                ></div>
+                <IAPView/>
             </div>
             {mockup != null && (
                 <div

@@ -19,6 +19,7 @@ import TimeCheatPage from "../pages/TimeCheatPage";
 import DailyBonusPage from "../pages/DailyBonusPage";
 import BalancyStatus from "../pages/BalancyStatus";
 import {commonHeaderStyles} from "./common/styles";
+import {IAPView} from "../features/simulateIAP";
 
 interface ReactAppModeProps {
     currentConfig: BalancyConfigParams;
@@ -125,6 +126,7 @@ const ReactAppMode: React.FC<ReactAppModeProps> = ({
                     </Routes>
                 </div>
             </div>
+            <IAPView/>
         </Router>
     );
 };
