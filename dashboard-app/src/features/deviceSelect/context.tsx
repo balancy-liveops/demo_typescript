@@ -27,7 +27,7 @@ export function DeviceSelectProvider({
     const [
         selectedDeviceId,
         setSelectedDeviceId
-    ] = useState<DeviceConfig['id']>();
+    ] = useState<DeviceConfig['id'] | undefined>('iphone-16-pro-max');
     const [
         isLandscape,
         setIsLandscape
