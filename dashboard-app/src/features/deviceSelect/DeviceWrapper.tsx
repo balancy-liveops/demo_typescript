@@ -62,12 +62,14 @@ export default function DeviceWrapper({
 
     const mockupWidth = `${(isLandscape ? height : width) + paddingLeft + paddingRight}px`;
     const mockupHeight = `${(isLandscape ? width : height) + paddingTop + paddingBottom}px`;
+    const totalWidth = (selectedDevice.width - (isLandscape ? spaceForIsland : 0)) * pixelRatio;
     return (
         <div style={styles.container}>
             <div
                 id={'device-wrapper'}
                 style={{
-                    width: (selectedDevice.width - (isLandscape ? spaceForIsland : 0)) * pixelRatio,
+                    width: totalWidth,
+                    minWidth: totalWidth,
                     height: (selectedDevice.height - (isLandscape ? 0 : spaceForIsland)) * pixelRatio,
                     borderRadius,
                     overflow: 'hidden',
