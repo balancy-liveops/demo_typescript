@@ -24,12 +24,12 @@ declare global {
             Actions: typeof Balancy.Actions;
             Profiles: typeof Balancy.Profiles;
             DataObjectsManager: typeof Balancy.DataObjectsManager;
-            
+
             // Utility functions
             isReady: () => boolean;
             enableLogs: () => void;
             clearAllCallbacks: () => void;
-            
+
             // Debug functions
             logStatus: () => void;
             logProfiles: () => void;
@@ -50,11 +50,7 @@ export interface BalancyConfigParams {
 }
 
 function preparePayments() {
-    Balancy.Actions.Ads.setAdWatchCallback((storeItem : SmartObjectsStoreItem) => {
-        console.log('Fake ad watched for:', storeItem?.name);
-        //TODO Implement your ad watch logic here
-        storeItem?.adWasWatched();
-    });
+    Balancy.Actions.Ads.setAdWatchCallback(showFakeAdOverlay);
 
     Balancy.Actions.Purchasing.setHardPurchaseCallback((productInfo) => {
         console.log('Starting Purchase: ', productInfo?.productId);
@@ -104,6 +100,77 @@ function preparePayments() {
             price,
             "USD");
     });
+}
+
+function showFakeAdOverlay(callback: (success: boolean) => void): void {
+    console.log('Showing fake ad overlay...');
+
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    `;
+
+    const closeButton = document.createElement('button');
+    closeButton.textContent = '×';
+    closeButton.style.cssText = `
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        border: none;
+        background: #ff4444;
+        color: white;
+        font-size: 24px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10001;
+    `;
+    closeButton.onclick = () => {
+        document.body.removeChild(overlay);
+        if (callback) callback(false);
+    };
+
+    const description = document.createElement('div');
+    description.textContent = '📺 Ad Simulation - This is a demo ad';
+    description.style.cssText = `
+        color: white;
+        font-size: 18px;
+        margin-bottom: 20px;
+        text-align: center;
+    `;
+
+    const claimButton = document.createElement('button');
+    claimButton.textContent = 'Claim Reward';
+    claimButton.style.cssText = `
+        padding: 15px 30px;
+        font-size: 18px;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+    `;
+    claimButton.onclick = () => {
+        document.body.removeChild(overlay);
+        if (callback) callback(true);
+    };
+
+    overlay.appendChild(closeButton);
+    overlay.appendChild(description);
+    overlay.appendChild(claimButton);
+    document.body.appendChild(overlay);
 }
 
 export const initializeBalancy = async (configParams: BalancyConfigParams): Promise<void> => {
@@ -166,7 +233,7 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
 
     // Save config for debugging
     (window as any).currentBalancyConfig = configParams;
-    
+
     // Setup global access for debugging
     setupGlobalBalancyAccess();
 };
@@ -252,12 +319,12 @@ function setupGlobalBalancyAccess() {
         Actions: Balancy.Actions,
         Profiles: Balancy.Profiles,
         DataObjectsManager: Balancy.DataObjectsManager,
-        
+
         // Utility functions
         isReady: () => Balancy.Main.isReadyToUse,
         enableLogs: () => Balancy.Callbacks.initExamplesWithLogs(),
         clearAllCallbacks: () => Balancy.Callbacks.clearAll(),
-        
+
         // Debug functions
         logStatus: () => {
             console.group('🔍 Balancy Status');
@@ -266,7 +333,7 @@ function setupGlobalBalancyAccess() {
             console.log('Game ID:', (window as any).currentBalancyConfig?.apiGameId);
             console.groupEnd();
         },
-        
+
         logProfiles: () => {
             console.group('👤 Balancy Profiles');
             console.log('System Profile:', Balancy.Profiles.system);
@@ -277,13 +344,13 @@ function setupGlobalBalancyAccess() {
             }
             console.groupEnd();
         },
-        
+
         logCMSData: () => {
             console.group('📊 Balancy CMS Data');
             try {
                 // Get all available model types and their data
                 console.log('Store Items:', Balancy.CMS.getModels(SmartObjectsStoreItem, true));
-                
+
                 // You can add more specific model types here as needed
                 console.log('CMS instance:', Balancy.CMS);
             } catch (error) {
@@ -291,7 +358,7 @@ function setupGlobalBalancyAccess() {
             }
             console.groupEnd();
         },
-        
+
         logSystemProfile: () => {
             console.group('⚙️ System Profile Details');
             const systemProfile = Balancy.Profiles.system;
@@ -312,17 +379,17 @@ function setupGlobalBalancyAccess() {
             }
             console.groupEnd();
         },
-        
+
         // Universal method caller
         call: (methodPath: string, ...args: any[]) => {
             try {
                 const paths = methodPath.split('.');
                 let obj = Balancy as any;
-                
+
                 for (const path of paths) {
                     obj = obj[path];
                 }
-                
+
                 if (typeof obj === 'function') {
                     return obj.apply(Balancy, args);
                 } else {
@@ -334,10 +401,10 @@ function setupGlobalBalancyAccess() {
             }
         }
     };
-    
+
     // Also make Balancy directly available
     (window as any).Balancy = Balancy;
-    
+
     console.log('✅ Balancy SDK is now available in console!');
     console.log('📚 Available commands:');
     console.log('  🔍 BalancyDebug.logStatus() - show SDK status');

@@ -45,11 +45,7 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
 
     Balancy.Callbacks.clearAll();
 
-    Balancy.Actions.Ads.setAdWatchCallback((storeItem : SmartObjectsStoreItem) => {
-        console.log('Fake ad watched for:', storeItem?.name);
-        //TODO Implement your ad watch logic here
-        storeItem?.adWasWatched();
-    });
+    Balancy.Actions.Ads.setAdWatchCallback(showFakeAdOverlay);
 
     Balancy.Actions.Purchasing.setHardPurchaseCallback((productInfo) => {
         console.log('Starting Purchase: ', productInfo?.productId);
@@ -106,6 +102,77 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
 };
 
 // Helper function to get or create a persistent device ID
+function showFakeAdOverlay(callback: (success: boolean) => void): void {
+    console.log('Showing fake ad overlay...');
+    
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    `;
+
+    const closeButton = document.createElement('button');
+    closeButton.textContent = '×';
+    closeButton.style.cssText = `
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        border: none;
+        background: #ff4444;
+        color: white;
+        font-size: 24px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10001;
+    `;
+    closeButton.onclick = () => {
+        document.body.removeChild(overlay);
+        if (callback) callback(false);
+    };
+
+    const description = document.createElement('div');
+    description.textContent = '📺 Ad Simulation - This is a demo ad';
+    description.style.cssText = `
+        color: white;
+        font-size: 18px;
+        margin-bottom: 20px;
+        text-align: center;
+    `;
+
+    const claimButton = document.createElement('button');
+    claimButton.textContent = 'Claim Reward';
+    claimButton.style.cssText = `
+        padding: 15px 30px;
+        font-size: 18px;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+    `;
+    claimButton.onclick = () => {
+        document.body.removeChild(overlay);
+        if (callback) callback(true);
+    };
+
+    overlay.appendChild(closeButton);
+    overlay.appendChild(description);
+    overlay.appendChild(claimButton);
+    document.body.appendChild(overlay);
+}
+
 function getOrCreateDeviceId(): string {
     const storageKey = 'balancy_device_id';
     let deviceId = localStorage.getItem(storageKey);
