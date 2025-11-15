@@ -1,5 +1,8 @@
-import React, {createContext, ReactNode, useContext, useState} from "react";
+import React, {createContext, ReactNode, useContext, useState, useEffect} from "react";
 import {DeviceConfig} from "./devicesConfig";
+
+const STORAGE_KEY_DEVICE_ID = 'balancy-selected-device-id';
+const STORAGE_KEY_LANDSCAPE = 'balancy-device-landscape';
 
 type DeviceSelectContextType = {
     selectedDeviceId?: string;
@@ -26,12 +29,32 @@ export function DeviceSelectProvider({
 }: DeviceSelectProviderProps): JSX.Element | null {
     const [
         selectedDeviceId,
-        setSelectedDeviceId
-    ] = useState<DeviceConfig['id'] | undefined>('iphone-16-pro-max');
+        setSelectedDeviceIdState
+    ] = useState<DeviceConfig['id'] | undefined>(() => {
+        const saved = localStorage.getItem(STORAGE_KEY_DEVICE_ID);
+        return saved || 'iphone-16-pro-max';
+    });
     const [
         isLandscape,
-        setIsLandscape
-    ] = useState(false);
+        setIsLandscapeState
+    ] = useState(() => {
+        const saved = localStorage.getItem(STORAGE_KEY_LANDSCAPE);
+        return saved === 'true';
+    });
+
+    const setSelectedDeviceId = (id?: string) => {
+        setSelectedDeviceIdState(id);
+        if (id) {
+            localStorage.setItem(STORAGE_KEY_DEVICE_ID, id);
+        } else {
+            localStorage.removeItem(STORAGE_KEY_DEVICE_ID);
+        }
+    };
+
+    const setIsLandscape = (landscape: boolean) => {
+        setIsLandscapeState(landscape);
+        localStorage.setItem(STORAGE_KEY_LANDSCAPE, String(landscape));
+    };
     return (
         <DeviceSelectContext.Provider value={{
             selectedDeviceId,
