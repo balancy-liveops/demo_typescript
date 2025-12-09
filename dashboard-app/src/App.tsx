@@ -298,6 +298,15 @@ const styles: { [key: string]: React.CSSProperties } = {
 function addKeyframes() {
     const style = document.createElement('style');
     style.type = 'text/css';
+
+    /**
+     * NOTE: Under html, the color-scheme property is needed since without it, the
+     * background color (while in device mockup mode, the surrounding background of
+     * the device) reverts back to white in dark mode, even if the device background
+     * is set to be transparent. Without this fix, it may initially get the correct
+     * color upon switching to dark mode, but upon and re-render (for example, by
+     * zooming in/out), it will revert back to white.
+     */
     style.innerHTML = `
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -310,6 +319,7 @@ function addKeyframes() {
             width: 100% !important;
             margin: 0 !important;
             padding: 0 !important;
+            color-scheme: light dark;
         }
         body {
             overflow: hidden !important;
