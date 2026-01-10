@@ -8,15 +8,15 @@
     "balancy": "balancy"
   },
   "dependencies": {
-    "@balancy/utils": "^1.1.10",
+    "@balancy/utils": "^1.2.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^7.1.1",
     "react-scripts": "^5.0.1"
   },
   "devDependencies": {
-    "@balancy/cli": "^1.0.10",
-    "@balancy/core": "^1.1.37",
+    "@balancy/cli": "^1.2.0",
+    "@balancy/core": "^1.2.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "typescript": "^4.9.5"
