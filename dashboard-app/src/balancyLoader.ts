@@ -84,21 +84,36 @@ function preparePayments() {
         // Implement your hard purchase logic here
     });
 
-    Balancy.Actions.Purchasing.setGetHardPurchaseInfoCallback((productId) => {
-        const allStoreItems = Balancy.CMS.getModels(SmartObjectsStoreItem, true);
-        let price = 0.01;
-        for (const storeItem of allStoreItems) {
-            if (storeItem?.price?.product?.productId === productId) {
-                price = storeItem.price.product.price;
-                break;
+    Balancy.Actions.Purchasing.setGetHardPurchaseInfoCallback((productId, callback) => {
+        console.info(">>>>> ", productId);
+        Balancy.API.getProduct(productId, (response) => {
+            const hardProductInfo = new BalancyHardProductInfo(
+                "Unknown Product",
+                "Product information unavailable",
+                "$0.00",
+                0.0,
+                "USD"
+            );
+
+            if (response.success && response.product) {
+                const product = response.product;
+                hardProductInfo.LocalizedTitle = product.name || "Unknown Product";
+                hardProductInfo.LocalizedDescription = product.description || "Product information unavailable";
+                hardProductInfo.LocalizedPriceString = `$${product.price.toFixed(2)}`;
+                hardProductInfo.LocalizedPrice = product.price;
+                hardProductInfo.IsoCurrencyCode = "USD";
+
+                console.log("Product info fetched:", {
+                    title: hardProductInfo.LocalizedTitle,
+                    price: hardProductInfo.LocalizedPriceString,
+                    productId: productId
+                });
+            } else {
+                console.warn(`Failed to get product info for ${productId}: ${response.errorMessage}`);
             }
-        }
-        return new BalancyHardProductInfo(
-            "Test Purchase",
-            "Test Purchase Description",
-            `$${Number(price).toFixed(2)}`,
-            price,
-            "USD");
+
+            callback?.(hardProductInfo);
+        });
     });
 }
 
@@ -399,6 +414,49 @@ function setupGlobalBalancyAccess() {
                 console.error('❌ Error calling method:', methodPath, error);
                 return null;
             }
+        },
+
+        // Test GetProducts API
+        testGetProducts: () => {
+            console.group('🛒 Testing GetProducts API');
+            Balancy.API.getProducts((response) => {
+                if (response.success) {
+                    console.log(`✅ Success! Found ${response.products.length} products:`);
+                    response.products.forEach((product, index) => {
+                        console.log(`  ${index + 1}. ${product.name} (${product.productId})`);
+                        console.log(`     Platform ID: ${product.platformProductId}`);
+                        console.log(`     Price: $${product.price.toFixed(2)}`);
+                        console.log(`     Type: ${product.type}`);
+                    });
+                } else {
+                    console.error(`❌ Failed: ${response.errorMessage} (code: ${response.errorCode})`);
+                }
+                console.groupEnd();
+            });
+        },
+
+        // Test GetProduct API
+        testGetProduct: (productId: string) => {
+            if (!productId) {
+                console.error('❌ Please provide a product ID. Usage: BalancyDebug.testGetProduct("your_product_id")');
+                return;
+            }
+            console.group(`🛒 Testing GetProduct API for: ${productId}`);
+            Balancy.API.getProduct(productId, (response) => {
+                if (response.success && response.product) {
+                    const product = response.product;
+                    console.log(`✅ Product found:`);
+                    console.log(`  Name: ${product.name}`);
+                    console.log(`  Product ID: ${product.productId}`);
+                    console.log(`  Platform ID: ${product.platformProductId}`);
+                    console.log(`  Description: ${product.description}`);
+                    console.log(`  Price: $${product.price.toFixed(2)}`);
+                    console.log(`  Type: ${product.type}`);
+                } else {
+                    console.error(`❌ Failed: ${response.errorMessage} (code: ${response.errorCode})`);
+                }
+                console.groupEnd();
+            });
         }
     };
 
@@ -411,11 +469,15 @@ function setupGlobalBalancyAccess() {
     console.log('  👤 BalancyDebug.logProfiles() - show profiles');
     console.log('  📊 BalancyDebug.logCMSData() - show CMS data');
     console.log('  ⚙️ BalancyDebug.logSystemProfile() - system profile details');
+    console.log('  🛒 BalancyDebug.testGetProducts() - test GetProducts API');
+    console.log('  🛒 BalancyDebug.testGetProduct("product_id") - test GetProduct API');
     console.log('  🎯 BalancyDebug.call("Main.isReadyToUse") - call any method');
     console.log('  📱 Balancy.Main, Balancy.CMS, Balancy.API - direct access');
     console.log('');
     console.log('🚀 Examples:');
     console.log('  BalancyDebug.isReady()');
+    console.log('  BalancyDebug.testGetProducts()');
+    console.log('  BalancyDebug.testGetProduct("your_product_id")');
     console.log('  BalancyDebug.call("CMS.getModels", SmartObjectsStoreItem, true)');
     console.log('  Balancy.Profiles.system.generalInfo');
 }
