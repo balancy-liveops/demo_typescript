@@ -253,6 +253,17 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
     setupGlobalBalancyAccess();
 };
 
+/**
+ * Three types for now:
+ * - 'handshake' for getting the parent origin
+ * - 'html' for getting the html data
+ * - 'scripts' for getting the concatenated scripts
+ */
+enum MessageType {
+    Handshake = 'handshake',
+    Html = 'html',
+    Scripts = 'scripts',
+}
 // Good name, and good life advice.
 function listenToParentMessages(event: MessageEvent) {
     if (event.source !== window.parent) return;
@@ -260,17 +271,17 @@ function listenToParentMessages(event: MessageEvent) {
     const {
         // Version of this messaging data structure, just in case we change it later
         version,
-        // Two types for now: 'handshake' for getting the parent origin, and 'html' for getting the html data
         type,
     } = event.data;
+    const typedType = type as MessageType;
 
     if (version !== '1') {
         console.error('Unsupported messaging version:', version);
         return;
     }
 
-    switch (type) {
-        case 'handshake': {
+    switch (typedType) {
+        case MessageType.Handshake: {
             const response = {
                 version: '1',
                 type: 'handshake',
@@ -279,7 +290,7 @@ function listenToParentMessages(event: MessageEvent) {
             event.source.postMessage(response, event.origin);
             break;
         }
-        case 'html': {
+        case MessageType.Html: {
             const {
                 html,
                 viewId,
@@ -288,6 +299,18 @@ function listenToParentMessages(event: MessageEvent) {
 
             console.log(`Received HTML for View '${viewId}':`, html);
             UnnyObject.setTestView(viewId, html);
+            break;
+        }
+        case MessageType.Scripts: {
+            const {
+                scripts,
+                viewId,
+            } = event.data;
+            if (!scripts || !viewId) return;
+
+            console.log(`Received concatenated scripts for View '${viewId}':`, scripts);
+            // TODO: Set the scripts to the UnnyObject test view when supported
+            // UnnyObject.setTestView(viewId, html);
             break;
         }
         default: {
