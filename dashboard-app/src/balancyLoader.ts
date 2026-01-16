@@ -311,6 +311,8 @@ function listenToParentMessages(event: MessageEvent) {
             console.log(`Received concatenated scripts for View '${viewId}':`, scripts);
             // TODO: Set the scripts to the UnnyObject test view when supported
             // UnnyObject.setTestView(viewId, html);
+
+            Balancy.API.Debug.setCompiledScripts(scripts);
             break;
         }
         default: {
