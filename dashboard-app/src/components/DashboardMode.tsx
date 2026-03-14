@@ -119,16 +119,19 @@ const DashboardMode: React.FC<DashboardModeProps> = ({
                                     <span style={styles.statValue}>{level}</span>
                                 </div>
                                 <div style={styles.statItem}>
+                                    <span style={styles.statLabel}>Level Attempts:</span>
+                                    <span style={styles.statValue}>{levelAttempts}</span>
+                                </div>
+                            </div>
+
+                            <div style={styles.gameStats}>
+                                <div style={styles.statItem}>
                                     <span style={styles.statLabel}>Win Streak:</span>
                                     <span style={styles.statValue}>{winStreak}</span>
                                 </div>
                                 <div style={styles.statItem}>
                                     <span style={styles.statLabel}>Lose Streak:</span>
                                     <span style={styles.statValue}>{loseStreak}</span>
-                                </div>
-                                <div style={styles.statItem}>
-                                    <span style={styles.statLabel}>Level Attempts:</span>
-                                    <span style={styles.statValue}>{levelAttempts}</span>
                                 </div>
                             </div>
 
@@ -267,16 +270,17 @@ const styles: { [key: string]: React.CSSProperties } = {
     },
     gameStats: {
         display: 'flex',
-        gap: '40px',
+        gap: '10px',
         justifyContent: 'center',
         marginBottom: '25px',
         flexShrink: 0
     },
     statItem: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
+        gap: '20px',
         alignItems: 'center',
-        padding: '15px 25px',
+        padding: '10px 15px',
         backgroundColor: 'rgba(52, 73, 94, 0.3)',
         borderRadius: '10px',
         border: '1px solid rgba(52, 152, 219, 0.3)'
