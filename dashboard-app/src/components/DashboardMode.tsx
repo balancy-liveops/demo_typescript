@@ -24,6 +24,9 @@ const DashboardMode: React.FC<DashboardModeProps> = ({
 
     const [level, setLevel] = useState<number>(0);
     const [winStreak, setWinStreak] = useState<number>(0);
+    const [loseStreak, setLoseStreak] = useState<number>(0);
+    const [levelAttempts, setLevelAttempts] = useState<number>(0);
+    const [levelInProgress, setLevelInProgress] = useState<boolean>(false);
 
     const handleReset = () => {
         if (Balancy.Profiles?.reset) {
@@ -37,19 +40,31 @@ const DashboardMode: React.FC<DashboardModeProps> = ({
             const generalInfo = Balancy.Profiles.system.generalInfo as any;
             setLevel(generalInfo.level || 0);
             setWinStreak(generalInfo.winStreak || 0);
+            setLoseStreak(generalInfo.loseStreak || 0);
+            setLevelAttempts(generalInfo.levelAttempts || 0);
         } else {
             setLevel(1);
             setWinStreak(0);
+            setLoseStreak(0);
+            setLevelAttempts(0);
         }
+    };
+
+    const handleLevelStarted = () => {
+        Balancy.API.General.levelStarted();
+        setLevelInProgress(true);
+        updateGameStats();
     };
 
     const handleWin = () => {
         Balancy.API.General.levelCompleted();
+        setLevelInProgress(false);
         updateGameStats();
     };
 
     const handleLose = () => {
         Balancy.API.General.levelFailed();
+        setLevelInProgress(false);
         updateGameStats();
     };
 
@@ -107,24 +122,44 @@ const DashboardMode: React.FC<DashboardModeProps> = ({
                                     <span style={styles.statLabel}>Win Streak:</span>
                                     <span style={styles.statValue}>{winStreak}</span>
                                 </div>
+                                <div style={styles.statItem}>
+                                    <span style={styles.statLabel}>Lose Streak:</span>
+                                    <span style={styles.statValue}>{loseStreak}</span>
+                                </div>
+                                <div style={styles.statItem}>
+                                    <span style={styles.statLabel}>Level Attempts:</span>
+                                    <span style={styles.statValue}>{levelAttempts}</span>
+                                </div>
                             </div>
 
                             {/* Simulation Buttons */}
                             <div style={styles.simulationButtons}>
-                                <button
-                                    className="action-button win-button"
-                                    style={{...styles.actionButton, ...styles.winButton}}
-                                    onClick={handleWin}
-                                >
-                                    🏆 Win
-                                </button>
-                                <button
-                                    className="action-button lose-button"
-                                    style={{...styles.actionButton, ...styles.loseButton}}
-                                    onClick={handleLose}
-                                >
-                                    ❌ Lose
-                                </button>
+                                {!levelInProgress ? (
+                                    <button
+                                        className="action-button start-button"
+                                        style={{...styles.actionButton, ...styles.startButton}}
+                                        onClick={handleLevelStarted}
+                                    >
+                                        🎮 Level Started
+                                    </button>
+                                ) : (
+                                    <>
+                                        <button
+                                            className="action-button win-button"
+                                            style={{...styles.actionButton, ...styles.winButton}}
+                                            onClick={handleWin}
+                                        >
+                                            🏆 Win
+                                        </button>
+                                        <button
+                                            className="action-button lose-button"
+                                            style={{...styles.actionButton, ...styles.loseButton}}
+                                            onClick={handleLose}
+                                        >
+                                            ❌ Lose
+                                        </button>
+                                    </>
+                                )}
                             </div>
 
                             {Balancy.Profiles.system?.shopsInfo?.activeShopInfo && (
@@ -282,6 +317,10 @@ const styles: { [key: string]: React.CSSProperties } = {
         backgroundColor: '#e74c3c',
         color: '#fff',
     },
+    startButton: {
+        backgroundColor: '#3498db',
+        color: '#fff',
+    },
     shopButtonContainer: {
         display: 'flex',
         justifyContent: 'center',
@@ -357,6 +396,10 @@ styleSheet.innerHTML = `
     
     .lose-button:hover {
         background-color: #c0392b !important;
+    }
+
+    .start-button:hover {
+        background-color: #2980b9 !important;
     }
 `;
 document.head.appendChild(styleSheet);
