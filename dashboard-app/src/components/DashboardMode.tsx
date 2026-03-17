@@ -70,7 +70,6 @@ const DashboardMode: React.FC<DashboardModeProps> = ({
 
     const handleOpenShop = () => {
         Balancy.Profiles.system?.shopsInfo?.activeShopInfo?.shop?.unnyView?.openView((success: boolean)=> {
-            console.log("shop opened ? ", success);
         }, Balancy.Profiles.system?.shopsInfo?.activeShopInfo);
     };
 
