@@ -215,6 +215,8 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
         Balancy.Callbacks.onDataUpdated.subscribe((status) => {
             console.log(`=== Data Updated Callback === ${status.isCloudSynced} ; isCMSUpdated = ${status.isCMSUpdated} ; isProfileUpdated = ${status.isProfileUpdated}`);
             if (status.isCloudSynced) {
+
+                // Balancy.API.prepareWebView();
                 const systemProfile = Balancy.Profiles.system;
 
                 if (systemProfile) {
