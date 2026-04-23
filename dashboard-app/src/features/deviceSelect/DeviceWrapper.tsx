@@ -26,7 +26,7 @@ export default function DeviceWrapper({
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor: selectedDevice ? '#fff' : '#1a1a2e',
+            backgroundColor: selectedDevice ? 'transparent' : '#1a1a2e',
         }
     }
 
