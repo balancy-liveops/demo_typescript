@@ -50,7 +50,7 @@ const ReactAppMode: React.FC<ReactAppModeProps> = ({
     onDisconnect
 }) => {
     const handleReset = () => {
-        Balancy.Profiles.reset();
+        Balancy.Profiles.reset(() => {});
     };
 
     // Function to handle route changes and ensure URL params persist

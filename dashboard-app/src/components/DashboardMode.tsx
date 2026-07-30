@@ -30,8 +30,9 @@ const DashboardMode: React.FC<DashboardModeProps> = ({
 
     const handleReset = () => {
         if (Balancy.Profiles?.reset) {
-            Balancy.Profiles.reset();
-            updateGameStats();
+            Balancy.Profiles.reset(() => {
+                updateGameStats();
+            });
         }
     };
 

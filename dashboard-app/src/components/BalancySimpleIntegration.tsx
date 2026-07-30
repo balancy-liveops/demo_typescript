@@ -277,7 +277,9 @@ export const BalancySimpleIntegration: React.FC<BalancySimpleIntegrationProps> =
         <button
           onClick={() => {
             console.log('Resetting Balancy profiles...');
-            Balancy.Profiles.reset();
+            Balancy.Profiles.reset(() => {
+              console.log('Balancy profiles reset.');
+            });
           }}
           style={{
             position: 'fixed',

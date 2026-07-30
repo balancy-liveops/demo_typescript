@@ -9,15 +9,15 @@
     "balancy": "balancy"
   },
   "dependencies": {
-    "@balancy/utils": "^1.6.11",
+    "@balancy/utils": "^1.7.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^7.1.1",
     "react-scripts": "^5.0.1"
   },
   "devDependencies": {
-    "@balancy/cli": "^1.6.11",
-    "@balancy/core": "^1.6.11",
+    "@balancy/cli": "^1.7.1",
+    "@balancy/core": "^1.7.1",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "cross-env": "^7.0.3",
