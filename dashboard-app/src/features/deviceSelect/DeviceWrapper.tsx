@@ -1,5 +1,6 @@
-import React, {ReactNode, useLayoutEffect, useMemo, useRef} from "react";
+import React, {ReactNode, useEffect, useLayoutEffect, useMemo, useRef} from "react";
 
+import {Balancy} from "@balancy/core";
 import {useDeviceSelectContext} from "./context";
 import {ALL_DEVICES_CONFIG} from "./devicesConfig";
 import {IAPView} from "../simulateIAP";
@@ -27,6 +28,14 @@ export default function DeviceWrapper({
     const refChild = useRef<HTMLDivElement>(null);
     const refDevice = useRef<HTMLDivElement>(null);
     const refUnder = useRef<HTMLDivElement>(null);
+
+    // Warm up the persistent Balancy WebView shell once #device-wrapper is
+    // mounted, so the prepared shell iframe is appended inside the device
+    // screen. Preparing before the wrapper exists (e.g. during SDK init) lands
+    // the iframe in document.body and overflows the mockup.
+    useEffect(() => {
+        Balancy.API.prepareWebView();
+    }, []);
 
     const styles = {
         container: {

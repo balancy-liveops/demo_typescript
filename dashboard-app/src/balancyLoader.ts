@@ -212,16 +212,14 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
 
     // Create a promise that resolves when Balancy is fully initialized
     const initializationPromise = new Promise<void>((resolve, reject) => {
-        let persistentPreparationRequested = false;
         Balancy.Callbacks.onDataUpdated.subscribe((status) => {
-            // Warm up once per SDK initialization, including a local-data update.
-            if (!persistentPreparationRequested) {
-                persistentPreparationRequested = true;
-                Balancy.API.prepareWebView();
-            }
             console.log(`=== Data Updated Callback === ${status.isCloudSynced} ; isCMSUpdated = ${status.isCMSUpdated} ; isProfileUpdated = ${status.isProfileUpdated}`);
             if (status.isCloudSynced) {
 
+                // Persistent WebView warm-up lives in DeviceWrapper: it must run
+                // after #device-wrapper is mounted, otherwise the prepared shell
+                // iframe is appended to document.body and overflows the device
+                // mockup.
                 const systemProfile = Balancy.Profiles.system;
 
                 if (systemProfile) {
