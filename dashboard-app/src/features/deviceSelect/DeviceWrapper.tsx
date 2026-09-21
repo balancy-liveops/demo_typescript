@@ -29,10 +29,7 @@ export default function DeviceWrapper({
     const refDevice = useRef<HTMLDivElement>(null);
     const refUnder = useRef<HTMLDivElement>(null);
 
-    // Warm up the persistent Balancy WebView shell once #device-wrapper is
-    // mounted, so the prepared shell iframe is appended inside the device
-    // screen. Preparing before the wrapper exists (e.g. during SDK init) lands
-    // the iframe in document.body and overflows the mockup.
+    // Prepared before #device-wrapper exists, the shell iframe lands in document.body and overflows the mockup.
     useEffect(() => {
         Balancy.API.prepareWebView();
     }, []);

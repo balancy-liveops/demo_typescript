@@ -216,10 +216,7 @@ export const initializeBalancy = async (configParams: BalancyConfigParams): Prom
             console.log(`=== Data Updated Callback === ${status.isCloudSynced} ; isCMSUpdated = ${status.isCMSUpdated} ; isProfileUpdated = ${status.isProfileUpdated}`);
             if (status.isCloudSynced) {
 
-                // Persistent WebView warm-up lives in DeviceWrapper: it must run
-                // after #device-wrapper is mounted, otherwise the prepared shell
-                // iframe is appended to document.body and overflows the device
-                // mockup.
+                // Persistent WebView warm-up runs in DeviceWrapper, once #device-wrapper exists.
                 const systemProfile = Balancy.Profiles.system;
 
                 if (systemProfile) {
