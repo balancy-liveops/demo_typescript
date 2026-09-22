@@ -40,6 +40,7 @@ const GameEventsPage: React.FC = () => {
 
         const eventActivatedId = Balancy.Callbacks.onNewEventActivated.subscribe(handleNewEventActivated);
         const eventDeactivatedId = Balancy.Callbacks.onEventDeactivated.subscribe(handleEventDeactivated);
+        const eventRemovedId = Balancy.Callbacks.onEventRemoved.subscribe(handleEventDeactivated);
 
         refreshEvents();
 
@@ -50,6 +51,7 @@ const GameEventsPage: React.FC = () => {
         return () => {
             Balancy.Callbacks.onNewEventActivated.unsubscribe(eventActivatedId);
             Balancy.Callbacks.onEventDeactivated.unsubscribe(eventDeactivatedId);
+            Balancy.Callbacks.onEventRemoved.unsubscribe(eventRemovedId);
 
             clearInterval(intervalId); // Clear interval on unmount
         };

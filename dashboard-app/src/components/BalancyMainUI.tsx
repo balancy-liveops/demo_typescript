@@ -216,7 +216,7 @@ const BalancySection: React.FC<BalancySectionProps> = ({ placement, side }) => {
   // Unified methods using IViewModel interface
   const tryToAddEvent = useCallback((eventInfo: any) => {
     addElementFromViewModel(
-      eventInfo.gameEventUnnyId,
+      eventInfo.instanceId,
       eventInfo.gameEvent,
       eventInfo,
       () => eventInfo.isFinished ? -1 : eventInfo.getSecondsLeftBeforeDeactivation()
@@ -289,8 +289,8 @@ const BalancySection: React.FC<BalancySectionProps> = ({ placement, side }) => {
       tryToAddEvent(eventInfo);
     });
 
-    const onEventDeactivatedId = Callbacks.onEventDeactivated.subscribe((eventInfo) => {
-      removeElement(eventInfo.gameEventUnnyId);
+    const onEventRemovedId = Callbacks.onEventRemoved.subscribe((eventInfo) => {
+      removeElement(eventInfo.instanceId);
     });
 
     const onNewOfferActivatedId = Callbacks.onNewOfferActivated.subscribe((offerInfo) => {
@@ -326,7 +326,7 @@ const BalancySection: React.FC<BalancySectionProps> = ({ placement, side }) => {
     // Cleanup subscriptions using stored subscription IDs
     return () => {
       Callbacks.onNewEventActivated.unsubscribe(onNewEventActivatedId);
-      Callbacks.onEventDeactivated.unsubscribe(onEventDeactivatedId);
+      Callbacks.onEventRemoved.unsubscribe(onEventRemovedId);
       Callbacks.onNewOfferActivated.unsubscribe(onNewOfferActivatedId);
       Callbacks.onOfferDeactivated.unsubscribe(onOfferDeactivatedId);
       Callbacks.onNewOfferGroupActivated.unsubscribe(onNewOfferGroupActivatedId);
