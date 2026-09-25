@@ -143,8 +143,13 @@ export default function DeviceWrapper({
                     <div
                         id={'device-wrapper'}
                         style={{
+                            position: 'absolute',
+                            inset: 0,
                             width: '100%',
                             height: '100%',
+                            pointerEvents: 'none',
+                            // Own layer above the dashboard: whatever z-index the SDK gives the WebView, it stays under IAPView (10000).
+                            zIndex: 9999,
                         }}
                     ></div>
                     <IAPView/>
