@@ -5,7 +5,9 @@ import DeviceWrapper from './DeviceWrapper';
 import { DeviceSelectProvider, useDeviceSelectContext } from './context';
 import { IAPEventEmitter, IAPEvents } from '../simulateIAP';
 
-jest.mock('@balancy/core', () => ({ Balancy: { API: { prepareWebView: jest.fn() } } }));
+jest.mock('@balancy/core', () => ({
+  Balancy: { API: { prepareWebView: jest.fn() }, RenderViewsManager: { _webView: null } },
+}));
 
 const PHONE = 'iphone-16-pro-max';
 const OTHER_PHONE = 'android-medium';
@@ -18,6 +20,7 @@ beforeAll(() => {
 beforeEach(() => {
   localStorage.clear();
   Balancy.API.prepareWebView.mockReset();
+  Balancy.RenderViewsManager._webView = null;
 });
 
 function renderWrapper(deviceId) {
@@ -58,6 +61,29 @@ test('warms up the persistent WebView only once #device-wrapper exists', () => {
   try {
     expect(Balancy.API.prepareWebView).toHaveBeenCalled();
     expect(wrapperAtWarmUp).toBe(ui.wrapper());
+  } finally { ui.cleanup(); }
+});
+
+// Stopgap for SDK 1.9.5, which keeps sending views into a shell whose container was removed.
+test('closes the WebView along with #device-wrapper, e.g. when switching to Console mode', () => {
+  const closeWebView = jest.fn();
+  Balancy.RenderViewsManager._webView = { closeWebView, webViewManager: { getIframe: () => null } };
+  const ui = renderWrapper(PHONE);
+  try { expect(closeWebView).not.toHaveBeenCalled(); } finally { ui.cleanup(); }
+  expect(closeWebView).toHaveBeenCalledTimes(1);
+});
+
+test('closes a shell left outside #device-wrapper before warming up a new one', () => {
+  const calls = [];
+  const stray = document.body.appendChild(document.createElement('iframe'));
+  Balancy.RenderViewsManager._webView = {
+    closeWebView: () => { calls.push('close'); stray.remove(); },
+    webViewManager: { getIframe: () => (stray.isConnected ? stray : null) },
+  };
+  Balancy.API.prepareWebView.mockImplementation(() => calls.push('prepare'));
+  const ui = renderWrapper(PHONE);
+  try {
+    expect(calls).toEqual(['close', 'prepare']);
   } finally { ui.cleanup(); }
 });
 

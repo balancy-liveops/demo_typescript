@@ -31,7 +31,13 @@ export default function DeviceWrapper({
 
     // Prepared before #device-wrapper exists, the shell iframe lands in document.body and overflows the mockup.
     useEffect(() => {
+        // Stopgap until the SDK recovers a removed shell (plugin_cpp_typescript fix/persistent-shell-restart):
+        // 1.9.5 keeps sending views into it, so the shell lives and dies with #device-wrapper.
+        const webView = () => (Balancy.RenderViewsManager as any)?._webView;
+        const shell = webView()?.webViewManager?.getIframe?.();
+        if (shell && !document.getElementById('device-wrapper')?.contains(shell)) webView().closeWebView();
         Balancy.API.prepareWebView();
+        return () => webView()?.closeWebView?.();
     }, []);
 
     const styles = {
