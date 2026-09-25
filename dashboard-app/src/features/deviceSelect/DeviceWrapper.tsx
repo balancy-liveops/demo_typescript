@@ -73,6 +73,11 @@ export default function DeviceWrapper({
         const parent = refParent.current;
         const child = refChild.current;
         if (!parent || !child) return;
+        // Without a device the screen is the whole panel, unscaled.
+        if (selectedDevice == null) {
+            child.style.transform = '';
+            return;
+        }
         const resize = () => {
             const frameWidth = mockup ? (isLandscape ? mockupHeight : mockupWidth) : totalWidth;
             const frameHeight = mockup ? (isLandscape ? mockupWidth : mockupHeight) : totalHeight;
@@ -86,31 +91,9 @@ export default function DeviceWrapper({
         const observer = new ResizeObserver(resize);
         observer.observe(parent);
         return () => observer.disconnect();
-    }, [selectedDeviceId, totalWidth, totalHeight, mockupWidth, mockupHeight, mockup, isLandscape]);
+    }, [selectedDevice, selectedDeviceId, totalWidth, totalHeight, mockupWidth, mockupHeight, mockup, isLandscape]);
 
-    if (selectedDevice == null) {
-        return (
-            <div style={styles.container}>
-                <div
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                    }}
-                >
-                    {children}
-                    <div
-                        id={'device-wrapper'}
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                        }}
-                    ></div>
-                    <IAPView/>
-                </div>
-            </div>
-        )
-    }
-
+    // One tree for both modes: switching devices must not remount #device-wrapper, which holds the persistent WebView.
     return (
         <div
             style={styles.container}
@@ -143,8 +126,8 @@ export default function DeviceWrapper({
                 <div
                     ref={refChild}
                     style={{
-                        width: `${totalWidth}px`,
-                        height: `${totalHeight}px`,
+                        width: selectedDevice ? `${totalWidth}px` : '100%',
+                        height: selectedDevice ? `${totalHeight}px` : '100%',
                         borderRadius: screenBorderRadius,
                         flexShrink: 0,
                         overflow: 'hidden',
