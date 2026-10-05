@@ -1,5 +1,6 @@
-import React, {ReactNode, useLayoutEffect, useMemo, useRef} from "react";
+import React, {ReactNode, useEffect, useLayoutEffect, useMemo, useRef} from "react";
 
+import {Balancy} from "@balancy/core";
 import {useDeviceSelectContext} from "./context";
 import {ALL_DEVICES_CONFIG} from "./devicesConfig";
 import {IAPView} from "../simulateIAP";
@@ -27,6 +28,17 @@ export default function DeviceWrapper({
     const refChild = useRef<HTMLDivElement>(null);
     const refDevice = useRef<HTMLDivElement>(null);
     const refUnder = useRef<HTMLDivElement>(null);
+
+    // Prepared before #device-wrapper exists, the shell iframe lands in document.body and overflows the mockup.
+    useEffect(() => {
+        // Stopgap until the SDK recovers a removed shell (plugin_cpp_typescript fix/persistent-shell-restart):
+        // 1.9.5 keeps sending views into it, so the shell lives and dies with #device-wrapper.
+        const webView = () => (Balancy.RenderViewsManager as any)?._webView;
+        const shell = webView()?.webViewManager?.getIframe?.();
+        if (shell && !document.getElementById('device-wrapper')?.contains(shell)) webView().closeWebView();
+        Balancy.API.prepareWebView();
+        return () => webView()?.closeWebView?.();
+    }, []);
 
     const styles = {
         container: {
@@ -67,6 +79,11 @@ export default function DeviceWrapper({
         const parent = refParent.current;
         const child = refChild.current;
         if (!parent || !child) return;
+        // Without a device the screen is the whole panel, unscaled.
+        if (selectedDevice == null) {
+            child.style.transform = '';
+            return;
+        }
         const resize = () => {
             const frameWidth = mockup ? (isLandscape ? mockupHeight : mockupWidth) : totalWidth;
             const frameHeight = mockup ? (isLandscape ? mockupWidth : mockupHeight) : totalHeight;
@@ -80,31 +97,9 @@ export default function DeviceWrapper({
         const observer = new ResizeObserver(resize);
         observer.observe(parent);
         return () => observer.disconnect();
-    }, [selectedDeviceId, totalWidth, totalHeight, mockupWidth, mockupHeight, mockup, isLandscape]);
+    }, [selectedDevice, selectedDeviceId, totalWidth, totalHeight, mockupWidth, mockupHeight, mockup, isLandscape]);
 
-    if (selectedDevice == null) {
-        return (
-            <div style={styles.container}>
-                <div
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                    }}
-                >
-                    {children}
-                    <div
-                        id={'device-wrapper'}
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                        }}
-                    ></div>
-                    <IAPView/>
-                </div>
-            </div>
-        )
-    }
-
+    // One tree for both modes: switching devices must not remount #device-wrapper, which holds the persistent WebView.
     return (
         <div
             style={styles.container}
@@ -137,8 +132,8 @@ export default function DeviceWrapper({
                 <div
                     ref={refChild}
                     style={{
-                        width: `${totalWidth}px`,
-                        height: `${totalHeight}px`,
+                        width: selectedDevice ? `${totalWidth}px` : '100%',
+                        height: selectedDevice ? `${totalHeight}px` : '100%',
                         borderRadius: screenBorderRadius,
                         flexShrink: 0,
                         overflow: 'hidden',
@@ -154,8 +149,13 @@ export default function DeviceWrapper({
                     <div
                         id={'device-wrapper'}
                         style={{
+                            position: 'absolute',
+                            inset: 0,
                             width: '100%',
                             height: '100%',
+                            pointerEvents: 'none',
+                            // Own layer above the dashboard: whatever z-index the SDK gives the WebView, it stays under IAPView (10000).
+                            zIndex: 9999,
                         }}
                     ></div>
                     <IAPView/>
