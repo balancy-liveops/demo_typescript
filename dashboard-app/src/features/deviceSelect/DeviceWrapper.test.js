@@ -115,6 +115,15 @@ test('without a device the screen fills the panel with no transform, even after 
   } finally { ui.cleanup(); }
 });
 
+test('a phone screen is scaled on its own layer so nine-slices in the view don\'t seam; no device, no layer', () => {
+  const ui = renderWrapper(PHONE);
+  try {
+    expect(ui.screen().style.willChange).toBe('transform');
+    ui.switchTo('none');
+    expect(ui.screen().style.willChange).toBe('');
+  } finally { ui.cleanup(); }
+});
+
 test.each([['a phone', PHONE], ['no device', 'none']])('the IAP payment sheet stacks above the WebView layer with %s', (_, deviceId) => {
   const ui = renderWrapper(deviceId);
   try {
