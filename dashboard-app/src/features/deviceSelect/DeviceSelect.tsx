@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {useDeviceSelectContext} from "./context";
-import {LANDSCAPE_DEVICES_CONFIG, PORTRAIT_DEVICES_CONFIG} from "./devicesConfig";
+import {DEVICE_GROUPS, toLandscape} from "./devicesConfig";
 
 type DeviceSelectProps = {
 
@@ -13,7 +13,6 @@ export default function DeviceSelect(props: DeviceSelectProps): JSX.Element | nu
         setIsLandscape,
     } = useDeviceSelectContext();
 
-    const config = isLandscape ? LANDSCAPE_DEVICES_CONFIG : PORTRAIT_DEVICES_CONFIG;
     return (
         <div
             style={{
@@ -30,16 +29,24 @@ export default function DeviceSelect(props: DeviceSelectProps): JSX.Element | nu
                 }}
             >
                 <option value={'none'}>None</option>
-                {config.map(device => {
-                    return (
-                        <option
-                            key={device.id}
-                            value={device.id}
-                        >
-                            {`${device.name} - ${device.width} x ${device.height}`}
-                        </option>
-                    )
-                })}
+                {DEVICE_GROUPS.map(group => (
+                    <optgroup
+                        key={group.name}
+                        label={group.name}
+                    >
+                        {group.devices.map(portrait => {
+                            const device = isLandscape ? toLandscape(portrait) : portrait;
+                            return (
+                                <option
+                                    key={device.id}
+                                    value={device.id}
+                                >
+                                    {`${device.name} - ${device.width} x ${device.height}`}
+                                </option>
+                            )
+                        })}
+                    </optgroup>
+                ))}
             </select>
             <div
                 style={{

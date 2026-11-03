@@ -29,7 +29,7 @@ export type DeviceConfig = {
     }
 };
 
-export const PORTRAIT_DEVICES_CONFIG: DeviceConfig[] = [
+export const MOBILE_DEVICES_CONFIG: DeviceConfig[] = [
     {
         id:     'android-compact',
         name:   'Android Compact',
@@ -232,12 +232,71 @@ export const PORTRAIT_DEVICES_CONFIG: DeviceConfig[] = [
     },
 ];
 
-export const LANDSCAPE_DEVICES_CONFIG: DeviceConfig[] = PORTRAIT_DEVICES_CONFIG.map((device) => ({
-    ...device,
-    id:     `${device.id}-landscape`,
-    width:  device.height,
-    height: device.width,
-}));
+// Same tablets and desktops as the UI Builder, which has no mockups for them either.
+export const TABLET_DEVICES_CONFIG: DeviceConfig[] = [
+    {
+        id:     'ipad',
+        name:   'iPad',
+        width:  810,
+        height: 1080,
+    },
+    {
+        id:     'ipad-pro-11',
+        name:   'iPad Pro 11"',
+        width:  834,
+        height: 1194,
+    },
+    {
+        id:     'ipad-pro-13',
+        name:   'iPad Pro 13"',
+        width:  1024,
+        height: 1366,
+    },
+];
+
+export const DESKTOP_DEVICES_CONFIG: DeviceConfig[] = [
+    {
+        id:     'laptop-hd',
+        name:   'Laptop HD',
+        width:  1366,
+        height: 768,
+    },
+    {
+        id:     'full-hd',
+        name:   'Full HD',
+        width:  1920,
+        height: 1080,
+    },
+    {
+        id:     'desktop-2k',
+        name:   '2K',
+        width:  2560,
+        height: 1440,
+    },
+];
+
+export const DEVICE_GROUPS: {name: string; devices: DeviceConfig[]}[] = [
+    {name: 'Mobile', devices: MOBILE_DEVICES_CONFIG},
+    {name: 'Tablet', devices: TABLET_DEVICES_CONFIG},
+    {name: 'Desktop', devices: DESKTOP_DEVICES_CONFIG},
+];
+
+export const PORTRAIT_DEVICES_CONFIG: DeviceConfig[] = [
+    ...MOBILE_DEVICES_CONFIG,
+    ...TABLET_DEVICES_CONFIG,
+    ...DESKTOP_DEVICES_CONFIG,
+];
+
+export function toLandscape(device: DeviceConfig): DeviceConfig {
+    return {
+        ...device,
+        id:     `${device.id}-landscape`,
+        width:  device.height,
+        height: device.width,
+    };
+}
+
+export const LANDSCAPE_DEVICES_CONFIG: DeviceConfig[] = PORTRAIT_DEVICES_CONFIG.map(toLandscape);
 
 export const ALL_DEVICES_CONFIG = [
     ...PORTRAIT_DEVICES_CONFIG,

@@ -131,3 +131,25 @@ test.each([['a phone', PHONE], ['no device', 'none']])('the IAP payment sheet st
     expect(Number(sheet.style.zIndex)).toBeGreaterThan(Number(wrapper.style.zIndex));
   } finally { ui.cleanup(); }
 });
+
+// In a 1000 x 900 panel the iPad is bound by its height, Full HD by its width.
+test.each([
+  ['a tablet', 'ipad', '810px', '1080px', 900 / 1080],
+  ['a desktop', 'full-hd', '1920px', '1080px', 1000 / 1920],
+])('%s has no frame: the screen is the device size, scaled to fit', (_, deviceId, width, height, scale) => {
+  // jsdom has no layout, so without a panel size every scale would come out as 0.
+  const clientWidth = jest.spyOn(Element.prototype, 'clientWidth', 'get').mockReturnValue(1000);
+  const clientHeight = jest.spyOn(Element.prototype, 'clientHeight', 'get').mockReturnValue(900);
+  const ui = renderWrapper(deviceId);
+  try {
+    expect(ui.screen().style.width).toBe(width);
+    expect(ui.screen().style.height).toBe(height);
+    expect(ui.screen().style.transform).toBe(`scale(${scale})`);
+    // Phones put the screen between an underlay and the frame image.
+    expect(ui.screen().parentElement.children).toHaveLength(1);
+  } finally {
+    ui.cleanup();
+    clientWidth.mockRestore();
+    clientHeight.mockRestore();
+  }
+});
