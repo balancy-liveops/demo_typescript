@@ -131,3 +131,14 @@ test.each([['a phone', PHONE], ['no device', 'none']])('the IAP payment sheet st
     expect(Number(sheet.style.zIndex)).toBeGreaterThan(Number(wrapper.style.zIndex));
   } finally { ui.cleanup(); }
 });
+
+test.each([['a tablet', 'ipad', '810px', '1080px'], ['a desktop', 'full-hd', '1920px', '1080px']])('%s has no frame: the screen is the device size, scaled to fit', (_, deviceId, width, height) => {
+  const ui = renderWrapper(deviceId);
+  try {
+    expect(ui.screen().style.width).toBe(width);
+    expect(ui.screen().style.height).toBe(height);
+    expect(ui.transformed()).not.toEqual([]);
+    // Phones put the screen between an underlay and the frame image.
+    expect(ui.screen().parentElement.children).toHaveLength(1);
+  } finally { ui.cleanup(); }
+});
