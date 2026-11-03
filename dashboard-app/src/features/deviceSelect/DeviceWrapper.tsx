@@ -82,6 +82,7 @@ export default function DeviceWrapper({
         // Without a device the screen is the whole panel, unscaled.
         if (selectedDevice == null) {
             child.style.transform = '';
+            child.style.willChange = '';
             return;
         }
         const resize = () => {
@@ -89,6 +90,8 @@ export default function DeviceWrapper({
             const frameHeight = mockup ? (isLandscape ? mockupWidth : mockupHeight) : totalHeight;
             const scale = fitDeviceScale(parent.clientWidth, parent.clientHeight, frameWidth, frameHeight);
             child.style.transform = `scale(${scale})`;
+            // Rastered at full size and scaled by the GPU: drawn at a fractional scale, nine-slices in the view seam.
+            child.style.willChange = 'transform';
             const frameTransform = `scale(${scale}) ${isLandscape ? 'rotate(-90deg)' : ''}`;
             if (refDevice.current) refDevice.current.style.transform = frameTransform;
             if (refUnder.current) refUnder.current.style.transform = frameTransform;
