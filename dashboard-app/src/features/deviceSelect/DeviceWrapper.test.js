@@ -115,6 +115,23 @@ test('without a device the screen fills the panel with no transform, even after 
   } finally { ui.cleanup(); }
 });
 
+// Stopgap for SDK 1.9.x, which writes the window's size in px onto the WebView 100 ms after every window resize.
+test.each([['a phone', PHONE], ['no device', 'none']])('with %s the WebView keeps filling the screen after a window resize', (_, deviceId) => {
+  const ui = renderWrapper(deviceId);
+  try {
+    const shell = ui.attachShell();
+    shell.style.width = '470px';
+    shell.style.height = '930px';
+    // jsdom lets inline styles beat !important, so look for the rule a browser applies over them.
+    const pins = [...document.styleSheets]
+      .flatMap(sheet => [...sheet.cssRules])
+      .filter(rule => shell.matches(rule.selectorText));
+    expect(pins.some(rule => ['width', 'height'].every(prop =>
+      rule.style.getPropertyValue(prop) === '100%' && rule.style.getPropertyPriority(prop) === 'important'
+    ))).toBe(true);
+  } finally { ui.cleanup(); }
+});
+
 test.each([['a phone', PHONE], ['no device', 'none']])('the IAP payment sheet stacks above the WebView layer with %s', (_, deviceId) => {
   const ui = renderWrapper(deviceId);
   try {
