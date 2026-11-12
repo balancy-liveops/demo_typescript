@@ -8,6 +8,9 @@ import {IAPView} from "../simulateIAP";
 import {fitDeviceScale} from './deviceScale';
 
 const BACK_COLOR = '#1a1a2e';
+// Stopgap until the SDK sizes the WebView to its container: after every window resize, SDK 1.9.x writes the
+// window's size in px onto the iframe, which in here has to keep filling the device screen.
+const PIN_WEBVIEW_TO_SCREEN = '#device-wrapper > iframe { width: 100% !important; height: 100% !important; }';
 
 type DeviceWrapperProps = {
     children?: ReactNode;
@@ -104,6 +107,7 @@ export default function DeviceWrapper({
         <div
             style={styles.container}
         >
+            <style>{PIN_WEBVIEW_TO_SCREEN}</style>
             <div
                 ref={refParent}
                 style={{
